@@ -1,0 +1,9 @@
+<!--index.wxml-->
+<canvas canvas-id='mycanvas' class="mycanvas"></canvas>
+<view class="testPaint">
+<button type="primary" bindtap="toDrawElement">drawElement</button>
+<button type="primary" bindtap="toDrawElementsInOrder">drawElementsInOrder</button>
+<button type="primary" bindtap="toDrawElementsTogether">drawElementsTogether</button>
+<button type="primary" bindtap="toDrawElements">drawElements</button>
+</view>
+
