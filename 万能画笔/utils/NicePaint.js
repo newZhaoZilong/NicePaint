@@ -10,7 +10,8 @@ class NicePaint {
      */
     this.canvasHandle = {
       'image': this.drawImage.bind(this),
-      'text': this.drawText.bind(this)
+      'text': this.drawText.bind(this),
+      'rect': this.drawRect.bind(this)
     }
   }
   /**
@@ -103,8 +104,8 @@ class NicePaint {
     sy, //源图像的矩形选择框的左上角 y 坐标
     sWidth, //源图像的矩形选择框的宽度
     sHeight, //源图像的矩形选择框的高度
-    shadow, //阴影
-    borderRadius //这个还没写
+    shadow, //阴影,是个字符串类似'2 2 1 gray'
+    borderRadius //阴影和borderRadius不能共存,都设置的话，取borderRadius
   }) {
 
     return new Promise((resolve, reject) => {
@@ -113,7 +114,11 @@ class NicePaint {
           //如果不保存之前的绘图上下文的画，那么绘制阴影后，会影响到之后绘制的
           //图片
           this.ctx.save();
-          if (shadow) {
+          if (borderRadius) {
+            this.clipBorder(left, top, width, height, borderRadius, shadow);
+          }
+
+          if (shadow && !borderRadius) {
             var shadow_list = shadow.split(' ');
             if (shadow_list.length < 3) {
               reject('shadow4个属性必须全部填写');
@@ -148,10 +153,12 @@ class NicePaint {
     fontSize = 16, //文字的尺寸
     left = 0, //文字位于画布的x坐标
     top = 0, //文字位于画布的y坐标
-    width = 100, //文字的宽度，用于换行的
+    width = 300, //文字的宽度，用于换行的
     lineHeight = 20, //文字的行高,
     textAlign = 'left', //文字
     textBaseline = 'top',
+    font //如果定义了font，那么fontSize无效，font-weight只有normal和bold两个有效
+    //font是字符串格式类似,必须是30px而不是只有30这个数字   ‘bold 30px Arial‘
   }) {
     return new Promise((resolve, reject) => {
       this.ctx.save();
@@ -159,7 +166,13 @@ class NicePaint {
       this.ctx.setTextBaseline(textBaseline);
       this.ctx.setTextAlign(textAlign);
       this.ctx.setFillStyle(color);
-      this.ctx.setFontSize(fontSize);
+      if (font) {
+        this.ctx.font = font;
+      } else {
+        this.ctx.setFontSize(fontSize);
+      }
+
+
 
       var lineFontNumber = content.length; //字符个数
       var fillText = ''; //累加字符串
@@ -188,6 +201,73 @@ class NicePaint {
       resolve();
     })
   }
+  /**
+   * 绘制rect,可能是瞄边，也可能是填充
+   */
+  drawRect({
+    top = 10,
+    left = 10,
+    width = 200,
+    height = 200,
+    isFill = true,
+    lineWidth = 10,
+    color = 'red',
+    borderRadius
+  }) {
+    return new Promise((resolve, reject) => {
+      this.ctx.save();
+      if (borderRadius) {
+        this.clipBorder(left, top, width, height, borderRadius);
+      }
+      if (isFill) {
+        this.ctx.setFillStyle(color);
+        this.ctx.fillRect(top, left, width, height);
+
+      } else {
+        this.ctx.setStrokeStyle(color);
+        this.ctx.strokeRect(top, left, width, height);
+      }
+
+      this.ctx.restore();
+      resolve();
+    })
+  }
+  /**
+   * 对边框进行裁剪的小方法，可以将方形，图片裁剪出borderRadius
+   * clip=true是用于切角，
+   * clip=false是用于绘制阴影
+   */
+  clipBorder(left, top, width, height, borderRadius, shadow) {
+    if (borderRadius > 0.5) {
+      return;
+    }
+    var radius = height * borderRadius;
+    this.ctx.beginPath();
+    //画左上角
+    this.ctx.moveTo(left + width - radius, top);
+    this.ctx.arc(left + width - radius, top + radius, radius, 1.5 * Math.PI, 0);
+    //画右下角
+    this.ctx.lineTo(left + width, top + height - radius);
+    this.ctx.arc(left + width - radius, top + height - radius, radius, 0, 0.5 * Math.PI);
+    //画左下角
+    this.ctx.lineTo(left + radius, top + height);
+    this.ctx.arc(left + radius, top + height - radius, radius, 0.5 * Math.PI, Math.PI);
+    //画左上角
+    this.ctx.lineTo(left, top + radius);
+    this.ctx.arc(left + radius, top + radius, radius, Math.PI, 1.5 * Math.PI);
+
+    this.ctx.closePath();
+    if (shadow){
+      var shadow_list = shadow.split(' ');
+      //shadow4个属性必须全部填写
+      this.ctx.setShadow(...shadow_list);
+      //如果不用fill的话，阴影会变成一个圈，如果设置透明色的话，阴影也会变透明
+      this.ctx.fill();
+    }
+    this.ctx.clip();
+  }
+
+
 
   /**
    * 获取图片路径，其原理是首先判断缓存里是否有之前的url，
