@@ -1,0 +1,6 @@
+/* components/nicepaint/nicepaint.wxss */
+
+.board {
+  position: fixed;
+  top: 2000rpx;
+}

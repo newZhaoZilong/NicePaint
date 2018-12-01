@@ -18,8 +18,11 @@ class NicePaint {
    * 在构造函数里写this.draw = this.ctx.draw;结果在开发工具上不显示
    * 所以只能这样写
    */
-  draw(...args) {
-    return this.ctx.draw(...args);
+  draw() {
+    return new Proise((resolve,reject)=>{
+      this.ctx.draw(...args);
+      
+    })
   }
 
   /**

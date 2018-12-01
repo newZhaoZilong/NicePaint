@@ -34,6 +34,7 @@ App({
     })
   },
   globalData: {
-    userInfo: null
+    userInfo: null,
+    localhost: 'https://pay.changingstudy.com/studygame',
   }
 })

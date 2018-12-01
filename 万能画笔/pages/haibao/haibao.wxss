@@ -1,0 +1,44 @@
+/* pages/haibao/haibao.wxss */
+.exampleBox {
+  height:26vh;
+  width: 80%;
+  border-radius: 10rpx;
+  position: absolute;
+  left: 10%;
+  top: 8vh;
+  box-shadow: 0 0 0 5px white;
+  background-color: white;
+}
+.posterView{
+  height:100vh;
+  width:100vw;
+  position:absolute;
+  top:0;
+}
+.posterViewBg{
+  background-color:#000000;
+  opacity:0.8;
+}
+.closeBtn{
+  position:absolute;
+  width:60rpx;
+  height:60rpx;
+  right:30rpx;
+  top:20rpx;
+}
+.share-image {
+  width: 80vw;
+  height: 80vh;
+  margin: 5vh 10vw;
+  position: absolute;
+}
+.savePosterBtn {
+  bottom: 5vh;
+  left: 14vw;
+  width: 72vw;
+  height: 6vh;
+  line-height: 6vh;
+  text-align: center;
+  font-size: 30rpx;
+  position: absolute;
+}

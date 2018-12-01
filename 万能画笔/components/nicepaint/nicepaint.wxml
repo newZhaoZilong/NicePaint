@@ -1,0 +1,2 @@
+<!--components/nicepaint/nicepaint.wxml-->
+<canvas canvas-id="canvasdrawer" style="width:{{canvasWidth}}px;height:{{canvasHeight}}px;" class="board" wx:if="{{showCanvas}}"></canvas>

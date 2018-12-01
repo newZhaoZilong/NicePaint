@@ -1,0 +1,15 @@
+<!--pages/haibao/haibao.wxml-->
+<text>pages/haibao/haibao.wxml</text>
+<button type="primary" bindtap="drawHaibao">画海报</button>
+  <!--分享海报-->
+  <view class="posterView" wx:if="{{isShowPoster}}">
+    <view class="posterView posterViewBg"></view>
+    <image src="{{shareImage}}" class="share-image" mode='aspectFit'></image>
+    <image src='/images/closeBtn.png' class="closeBtn" bindtap="closePoster"></image>
+    <nicepaint painting="{{painting}}" class="canvasdrawer" bind:getImage="eventGetImage"/>
+    <button class="yellow-white-btn savePosterBtn" bindtap='eventSave'>保存图片</button>
+  </view>
+<!-- <button type="primary" bindtap="drawHaibao">画海报</button>
+<image src="{{shareImage}}" class="share-image" mode='aspectFit'></image>
+<image src='/images/closeBtn.png' class="closeBtn" bindtap="closePoster"></image>
+<nicepaint painting="{{painting}}" bind:getImage="eventGetImage2" /> -->
