@@ -1,0 +1,6 @@
+<!--pages/sanwei/sanwei.wxml-->
+<button type="primary" bindtap="drawSanwei">画七维图</button>
+<!-- <canvas canvas-id='mycanvas' class="mycanvas"></canvas> -->
+ <!-- <image src="{{shareImage}}" class="share-image" mode='aspectFit'></image>
+<image src='/images/closeBtn.png' class="closeBtn" bindtap="closePoster"></image>
+<nicepaint painting="{{painting}}" bind:getImage="eventGetImage" /> -->

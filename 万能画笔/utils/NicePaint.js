@@ -19,9 +19,9 @@ class NicePaint {
    * 所以只能这样写
    */
   draw() {
-    return new Proise((resolve,reject)=>{
+    return new Proise((resolve, reject) => {
       this.ctx.draw(...args);
-      
+
     })
   }
 
@@ -236,6 +236,40 @@ class NicePaint {
     })
   }
   /**
+   * 绘制多边形,可以是描边,也可以是填充
+   * polygon['po li gen] 需要比绘制rect多接收一个坐标数组 
+   * 暂时没有borderRadius方法,不过要做的话应该也是可以做的，
+   * 以后再说
+   */
+  drawPolygon({
+    top = 10,
+    left = 10,
+    width = 200,
+    height = 200,
+    isFill = true,
+    lineWidth = 10,
+    color = 'red',
+    points
+  }) {
+    return new Promise((resolve, reject) => {
+      this.ctx.save();
+      if (borderRadius) {
+        this.clipBorder(left, top, width, height, borderRadius);
+      }
+      if (isFill) {
+        this.ctx.setFillStyle(color);
+        this.ctx.fillRect(top, left, width, height);
+
+      } else {
+        this.ctx.setStrokeStyle(color);
+        this.ctx.strokeRect(top, left, width, height);
+      }
+
+      this.ctx.restore();
+      resolve();
+    })
+  }
+  /**
    * 对边框进行裁剪的小方法，可以将方形，图片裁剪出borderRadius
    * clip=true是用于切角，
    * clip=false是用于绘制阴影
@@ -260,7 +294,7 @@ class NicePaint {
     this.ctx.arc(left + radius, top + radius, radius, Math.PI, 1.5 * Math.PI);
 
     this.ctx.closePath();
-    if (shadow){
+    if (shadow) {
       var shadow_list = shadow.split(' ');
       //shadow4个属性必须全部填写
       this.ctx.setShadow(...shadow_list);
@@ -304,6 +338,42 @@ class NicePaint {
         }
       }
     })
+  }
+  
+  /**
+   * 根据一个坐标,角度,半径,获取另一个角标
+   */
+  getLocation(x, y, A, radius) {
+    return {
+      x: x + radius * Math.cos(A),
+      y: y + radius * Math.sin(A)
+    }
+  }
+  /**
+   * 根据两点坐标计算出弧度
+   */
+  getA(sX, sY, eX, eY) {
+    var tanA = (eY - sY) / (eX - sX);
+    var A = Math.atan(tanA);
+    if (eX >= sX && eY >= sY) {
+      //在第一区域,不需要改变,包括右坐标和下坐标
+    } else if (eX < sX && eY >= sY) {
+      //在第二区域,包括左边坐标,负值
+      A = A + Math.PI;
+    } else if (eX < sX && eY < sY) {
+      //在第三区域,不包括坐标,正值
+      A = Math.PI + A;
+    } else if (eX >= sX && eY < sY) {
+      //在第四区域,包括上坐标,负值
+      A = 2 * Math.PI + A;
+    }
+    return A //* 180 / Math.PI
+  }
+  /**
+   * 根据两点坐标计算出距离
+   */
+  getDistance(sX, sY, eX, eY) {
+    return Math.sqrt(Math.pow(eY - sY, 2) + Math.pow(eX - sX, 2));
   }
   /**
    * 保存图片到相册

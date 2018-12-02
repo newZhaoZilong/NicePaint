@@ -10,10 +10,15 @@ Page({
     header: 'https://productionvote.changingstudy.com/oSjgK0bt9fVjIE1v885lfX0OcWIs1541153097032791397_s.jpg',
     scancodeUrl: 'https://productionvote.changingstudy.com/oSjgK0bvBk1mlVxVKUCDjmHg38QI20181121125737.jpg'
   },
+  onLoad(){
+    this.nicepaint = this.selectComponent('#nicepaint');
+
+  },
   /**
    * 画海报结束
    */
   eventGetImage(event) {
+
     console.log('海报绘制完成', event);
     wx.hideLoading()
     const {
@@ -90,7 +95,6 @@ Page({
         painting: {
           width: width,
           height: height,
-          clear: true,
           views: [{
               type: 'rect',
               color: '#51bda3',
