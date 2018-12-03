@@ -80,7 +80,7 @@ Component({
             this.saveImageToLocal()
               .then((res) => {
                 this.setData({
-                  showCanvas: false,
+                  // showCanvas: false,
                   isPainting: false,
                 })
                 this.triggerEvent('getImage', {
@@ -90,7 +90,7 @@ Component({
               })
               .catch((res) => {
                 this.setData({
-                  showCanvas: false,
+                  // showCanvas: false,
                   isPainting: false,
                 })
                 this.triggerEvent('getImage', {
@@ -101,7 +101,7 @@ Component({
         })
         .catch(() => {
           this.setData({
-            showCanvas: false,
+            // showCanvas: false,
             isPainting: false,
           })
           this.triggerEvent('getImage', {
@@ -351,7 +351,7 @@ Component({
       lines = 4,
       isArc = false,
       isPolygon = true,
-      isCenter
+      isVertexLine = true
     }) {
       // //是否画中线
       // if (isPolygon && !isFill && isCenter) {
@@ -397,8 +397,8 @@ Component({
             radius: radius - count * interval,
             lines
           });
-          //画中心线
-          if (isPolygon && !isFill && isCenter && count == 0) {
+          //画顶点线
+          if (isPolygon && !isFill && isVertexLine && count == 0) {
             locations.forEach((v) => {
               this.ctx.moveTo(x, y);
               this.ctx.lineTo(v.x, v.y);

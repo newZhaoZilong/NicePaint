@@ -1,4 +1,6 @@
 <!--pages/zujian/zujian.wxml-->
 <button type="primary" bindtap="drawSanwei">画七维图</button>
+<button type="primary" bindtap="drawSanwei2">画七维图2</button>
  <image src="{{shareImage}}" class="share-image" mode='aspectFit'></image>
+ <image src="{{shareImage2}}" class="share-image" mode='aspectFit'></image>
 <nicepaint painting="{{painting}}" bind:getImage="eventGetImage" />

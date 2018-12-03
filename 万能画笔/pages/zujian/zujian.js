@@ -69,17 +69,73 @@ Page({
     //               color: 'orange'
     //             }]
     // }
+
     // {
-    //   type: 'net',
+    //   type: 'abilitychart',
     //     x: 500,
     //       y: 500,
-    //         radius: 300,
-    //           level: 20,
-    //             color: 'black',
-    //               lineWidth: 2,
-    //                 isArc: true,
-    //                   isPolygon: false
+    //         radius: 400,
+    //           scores: [{
+    //             score: 80,
+    //             color: '#0000ff'
+    //           }, {
+    //             score: 70,
+    //             color: 'black'
+    //           }, {
+    //             score: 90,
+    //             color: '#00ff00'
+    //           }, {
+    //             score: 80,
+    //             color: '#0000ff'
+    //           }, {
+    //             score: 70,
+    //             color: 'black'
+    //           }, {
+    //             score: 90,
+    //             color: '#00ff00'
+    //           }, {
+    //             score: 70,
+    //             color: 'black'
+    //           }],
+    //             net: {
+    //     level: 5,
+    //       lineWidth: 30,
+    //         color: 'red',
+    //           isCenter: true,
+    //         // isArc:true,
+    //         // isPolygon:false
+    //       },
+    //   polygon: {
+
+    //     isStroke: true,
+    //       lineColor: 'yellow',
+    //         lineWidth: 10,
+       
+    //       },
+    //   vertex: {
+    //     color: 'white',
+    //       radius: 20
+    //   }
     // }
+    this.setData({
+
+      painting: {
+        width: 300,
+        height: 300,
+        clear: false,
+        views: [{
+          type:'net',
+          x:150,
+          y:150,
+          radius:150,
+          level:5,
+          isArc:true,
+          isPolygon:false
+        }]
+      }
+    })
+  },
+  drawSanwei2(){
     this.setData({
       painting: {
         width: 1080,
@@ -88,48 +144,41 @@ Page({
           type: 'abilitychart',
           x: 500,
           y: 500,
-          radius: 400,
-          scores: [{
-            score: 80,
-            color: '#0000ff'
-          }, {
-            score: 70,
-            color: 'black'
-          }, {
-            score: 90,
-            color: '#00ff00'
-            }, {
-              score: 80,
-              color: '#0000ff'
-            }, {
-              score: 70,
-              color: 'black'
-            }, {
+          radius: 300,
+          scores:[{
+            score:80,
+            color:'red'
+          },{
+            score:90,
+            color:'blue'
+          },{
               score: 90,
-              color: '#00ff00'
-            },{
-              score: 70,
-              color: 'black'
-            }],
-          net: {
+              color: 'green'
+          }],
+          net:{
+            isArc:true,
+            isPolygon:false,
             level: 5,
-            lineWidth: 30,
-            color: 'red',
-            isCenter:true,
-            // isArc:true,
-            // isPolygon:false
           },
-          polygon: {
+          polygon:{
+            // points:[{
+            //   x:300,
+            //   y:200
+            // },{
+            //   x:500,
+            //   y:300
+            // },{
+            //   x:100,
+            //   y:400
+            // }]
+          },
           
-            isStroke:true,
-            lineColor:'yellow',
-            lineWidth:10,
-       
-          },
-          vertex:{
-            color:'white',
-            radius:20
-          }
+          
+          // color: 'yellow',
+          // lineWidth: 5,
+          // isCenter: true,
+          // isArc: false,
+          // isPolygon: true
         }]
       }
     })
@@ -139,6 +188,7 @@ Page({
    * 画海报结束
    */
   eventGetImage(event) {
+    console.log('绘制成功，获取图片event', event)
     const {
       tempFilePath,
       errMsg
