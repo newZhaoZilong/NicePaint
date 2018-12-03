@@ -1,9 +1,8 @@
 <!--index.wxml-->
-<canvas canvas-id='mycanvas' class="mycanvas"></canvas>
-<view class="testPaint">
-<button type="primary" bindtap="toDrawElement">drawElement</button>
-<button type="primary" bindtap="toDrawElementsInOrder">drawElementsInOrder</button>
-<button type="primary" bindtap="toDrawElementsTogether">drawElementsTogether</button>
-<button type="primary" bindtap="toDrawElements">drawElements</button>
+<button type="primary" bindtap="drawNet">绘制网格</button>
+<button type="primary" bindtap="drawPolygon">绘制中心多边形</button>
+<button type="primary" bindtap="turnToResult">绘制能力表</button>
+<view class="ability-container">
+<image src="{{netUrl}}" class="ability-sanwei"></image>
 </view>
-
+<nicepaint painting="{{painting}}" bind:getImage="getImage"></nicepaint>

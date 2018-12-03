@@ -37,14 +37,8 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 3,
+			"current": -1,
 			"list": [
-				{
-					"id": -1,
-					"name": "画海报",
-					"pathName": "pages/logs/logs",
-					"query": ""
-				},
 				{
 					"id": -1,
 					"name": "海报组件",
@@ -55,12 +49,6 @@
 					"id": -1,
 					"name": "画7维图",
 					"pathName": "pages/sanwei/sanwei",
-					"query": ""
-				},
-				{
-					"id": -1,
-					"name": "画7维图实战",
-					"pathName": "pages/zujian/zujian",
 					"query": ""
 				}
 			]

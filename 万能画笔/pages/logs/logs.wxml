@@ -1,9 +1,0 @@
-<!--logs.wxml-->
-<button type='primary' bindtap="prepareDraw">画海报</button>
-<block wx:if="{{showCanvas}}">
-  <view class="canvas-mask">
-    <canvas canvas-id='canvasId' class="mycanvas" style="width:{{canvasWidth}}px;height:{{canvasHeight}}px;"></canvas>
-    <button type='primary' bindtap="saveTo">保存到相册</button>
-  </view>
-
-</block>

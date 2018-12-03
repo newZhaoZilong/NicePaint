@@ -1,7 +1,0 @@
-/* pages/zujian/zujian.wxss */
-.share-image {
-  width: 80vw;
-  height: 40vh;
-  margin: 5vh 10vw;
-  position: absolute;
-}

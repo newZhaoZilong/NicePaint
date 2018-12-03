@@ -15,8 +15,9 @@ Component({
             this.setData({
               showCanvas: true,
               isPainting: true
+            }, () => {
+              this.readyPigment()
             })
-            this.readyPigment()
           }
         }
       }
@@ -30,7 +31,8 @@ Component({
     showCanvas: false,
     //图片缓存
     cache: {},
-    isPainting: false
+    isPainting: false,
+    clear: false
   },
   ready() {
     this.ctx = wx.createCanvasContext('canvasdrawer', this);
@@ -65,49 +67,56 @@ Component({
         width,
         height,
         views,
-        clear
       } = this.data.painting;
-      console.log('当前页面的width,height,views', width, height, views)
+      // console.log('当前页面的width,height,views', width, height, views)
       this.setData({
         canvasWidth: width,
         canvasHeight: height,
-      })
-      //调用drawElements绘制图片     
-      this.downloadAllImageToCache(views)
-        .then(() => {
-          this.drawElements(views);
-          this.ctx.draw(clear, () => {
-            this.saveImageToLocal()
-              .then((res) => {
-                this.setData({
-                  // showCanvas: false,
-                  isPainting: false,
-                })
-                this.triggerEvent('getImage', {
-                  tempFilePath: res.tempFilePath,
-                  errMsg: 'canvasdrawer:ok'
-                })
+      }, () => {
+        setTimeout(() => { //调用drawElements绘制图片     
+          this.downloadAllImageToCache(views)
+            .then(() => {
+              this.drawElements(views);
+              this.ctx.draw(this.data.painting.clear || this.data.clear, () => {
+                this.saveImageToLocal()
+                  .then((res) => {
+                    this.setData({
+                      showCanvas: false,
+                      isPainting: false,
+                    })
+                    this.triggerEvent('getImage', {
+                      tempFilePath: res.tempFilePath,
+                      errMsg: 'canvasdrawer:ok'
+                    })
+                    console.log('全部元素绘制成功');
+                  })
+                  .catch((res) => {
+                    this.setData({
+                      showCanvas: false,
+                      isPainting: false,
+                    })
+                    this.triggerEvent('getImage', {
+                      errMsg: 'canvasdrawer:fail'
+                    })
+                    console.log('将图片从canvas上截取到本地失败');
+                  })
               })
-              .catch((res) => {
-                this.setData({
-                  // showCanvas: false,
-                  isPainting: false,
-                })
-                this.triggerEvent('getImage', {
-                  errMsg: 'canvasdrawer:fail'
-                })
+            })
+            .catch(() => {
+              this.setData({
+                //如果改为true,连续绘制就会出错
+                showCanvas: false,
+                isPainting: false,
               })
-          })
-        })
-        .catch(() => {
-          this.setData({
-            // showCanvas: false,
-            isPainting: false,
-          })
-          this.triggerEvent('getImage', {
-            errMsg: 'canvasdrawer:fail'
-          })
-        })
+              this.triggerEvent('getImage', {
+                errMsg: 'canvasdrawer:fail'
+              })
+              console.log('将图片下载到缓存失败');
+            })
+        }, 100)
+
+      });
+
     },
     /**
      * 将图片加载到缓存
@@ -168,11 +177,11 @@ Component({
       if (shadow && !borderRadius) {
         var shadow_list = shadow.split(' ');
         if (shadow_list.length < 3) {
-          reject('shadow4个属性必须全部填写');
+          console.log('shadow4个属性必须全部填写!!!!!!!!!');
         }
         this.ctx.setShadow(...shadow_list);
       }
-      console.log('当前图片本地路径', path);
+
 
       if (sx) {
         this.ctx.drawImage(path, sx, sy, sWidth, sHeight, left, top, width, height);
@@ -184,6 +193,7 @@ Component({
       //save+restore相当于重制之前的绘图上下文
       //避免设置的属性影响到其他图片
       this.ctx.restore();
+      console.log('绘制图片成功', url);
     },
 
     /**
@@ -259,7 +269,6 @@ Component({
       color = 'red',
       borderRadius
     }) {
-      console.log('当前drawRectwidth', width);
 
       this.ctx.save();
       if (borderRadius) {
@@ -275,6 +284,8 @@ Component({
       }
 
       this.ctx.restore();
+      console.log('绘制长方形成功');
+
     },
     /**
      * 绘制能力表,需要传入中心点坐标,
@@ -287,16 +298,9 @@ Component({
       y,
       radius, //半径
       scores, //能力值数组,必须写颜色,和能力值
-      net = {},
-      polygon = {},
-      vertex = {}
-      // lineWidth = 1,
-      // lineColor = 'white', //能力多边形的边框颜色,
-      // netColor = 'white', //网格的颜色
-      // isArc = true, //如果线框是圆形的，那么能力多边形在上,线框,在下,否则相反    
-      // pointColor,
-      // isFill = true,
-      // isStroke = true,
+      net = {}, //网格配置
+      polygon = {}, //中心多边形配置
+      vertex = {} //顶点配置
     }) {
       this.ctx.save();
 
@@ -308,7 +312,7 @@ Component({
         rates: scores.map((v) => v.score)
       });
       points.forEach((v, i) => {
-        v.color = scores[i].color || 'red'
+        v.color = scores[i].color
       })
       console.log(points);
       //封装画网格的参数对象
@@ -353,21 +357,7 @@ Component({
       isPolygon = true,
       isVertexLine = true
     }) {
-      // //是否画中线
-      // if (isPolygon && !isFill && isCenter) {
-      //   // var interval_A ;
-      //   this.ctx.save();
 
-      //   this.ctx.moveTo(x, y);
-      //   this.ctx.lineTo(x, y - radius);
-
-      //   this.ctx.setLineWidth(lineWidth);
-      //   this.ctx.setStrokeStyle(color);
-      //   this.ctx.stroke();
-      //   this.ctx.rotate(1);
-      //   this.ctx.rotate(2);
-      //   this.ctx.restore();
-      // }
       this.ctx.save();
       var interval = radius / level;
       var count = 0;
@@ -377,9 +367,8 @@ Component({
           var index = count % colors.length;
           color = colors[index];
         }
-
         if (isArc) { //绘制圆
-          console.log('绘制圆');
+
           this.drawArc({
             isFill,
             x,
@@ -397,7 +386,7 @@ Component({
             radius: radius - count * interval,
             lines
           });
-          //画顶点线
+          //画顶点到中心的连线
           if (isPolygon && !isFill && isVertexLine && count == 0) {
             locations.forEach((v) => {
               this.ctx.moveTo(x, y);
@@ -419,6 +408,8 @@ Component({
       }
 
       this.ctx.restore();
+
+      console.log('绘制网格成功');
     },
 
     /**
@@ -447,7 +438,7 @@ Component({
       color = 'red',
       points,
     }) {
-      console.log('绘制中心多边形');
+      
       if (!points) return;
       this.ctx.save();
       if (isStroke) {
@@ -474,6 +465,7 @@ Component({
       }
 
       this.ctx.restore();
+      console.log('绘制中心多边形成功');
     },
     /**
      * 绘制多边形
@@ -484,7 +476,6 @@ Component({
       color = 'red',
       points,
     }) {
-      console.log('绘制多边形');
       if (!points) return;
       this.ctx.save();
       this.ctx.beginPath();
@@ -501,6 +492,7 @@ Component({
         this.ctx.stroke();
       }
       this.ctx.restore();
+      console.log('绘制多边形成功');
     },
 
     /**
@@ -517,7 +509,7 @@ Component({
       color,
       lineWidth = 2
     }) {
-      console.log('绘制圆弧');
+      
       this.ctx.save();
       this.ctx.beginPath();
       this.ctx.arc(x, y, radius, sA, eA, isClockwise);
@@ -531,6 +523,7 @@ Component({
         this.ctx.stroke();
       }
       this.ctx.restore();
+      console.log('绘制圆弧成功');
     },
     /**
      * 根据一个中心点，半径,多边形边数，
@@ -648,7 +641,6 @@ Component({
           reject('图片路径不能为空');
         }
         if (this.data.cache[url]) {
-          console.log('返回缓存中的图片', this.data.cache[url])
           resolve(this.data.cache[url]);
         } else {
           const objExp = new RegExp(/^http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/);
@@ -657,7 +649,6 @@ Component({
               src: url,
               complete: res => {
                 if (res.errMsg === 'getImageInfo:ok') {
-
                   this.data.cache[url] = res.path;
                   console.log('下载图片成功', this.data.cache[url])
                   resolve(res.path);
