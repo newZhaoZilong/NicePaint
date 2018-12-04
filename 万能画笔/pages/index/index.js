@@ -118,7 +118,7 @@ Page({
           },
           vertex: {
             radius: isShort ? 5 : 3,
-            color: isShort ? 'yellow' : 'white'
+           
           }
         }]
       }
@@ -176,16 +176,18 @@ Page({
           width:200,
           height:200,
           views:[{
-            type: 'net',
+            type: 'arc',
             x: 100,
             y: 100,
             radius: 80,
-            level: 5,
+    
             isArc: true,
             isPolygon: false,
             lineWidth: 3,
+            
             isFill:true,
-            colors: ['black','yellow', 'orange','white']
+            
+            color:'#dedede'
           },{
             type:'net',
             x:100,
@@ -194,8 +196,9 @@ Page({
             level:5,
             isArc:true,
             isPolygon:false,
+              lines: 3,
             lineWidth:5,
-            color:'white'
+            color:'black'
           }]
         }
       })
@@ -215,9 +218,21 @@ Page({
       score:'90',
       color:'yellow'
     },{
-      score:'70',
-      color:'green'
-    }]
+      score:'100',
+        color:'rgb(0,0,255)'
+    },{
+        score: '70',
+        color: 'black'
+    },{
+        score: '70',
+        color: 'orange'
+    },{
+        score: '70',
+        color: 'blue'
+      }, {
+        score: '70',
+        color: 'pink'
+      }]
     this.setData({
 
       painting: {
@@ -232,11 +247,12 @@ Page({
           scores: scores,
           net: {
             color: 'red',
-            isArc: isShort,
-            isPolygon: !isShort,
+            isArc: !isShort,
+            isPolygon: isShort,
             lineWidth: isShort ? 3 : 1,
             level: 6,
-            isVertexLine: true
+            isVertexLine: true,
+            lines:3,
           },
           polygon: {
             isStroke: false,
@@ -245,7 +261,7 @@ Page({
           },
           vertex: {
             radius: isShort ? 5 : 3,
-            color: isShort ? 'yellow' : 'white'
+            color:'black',
           }
         }]
       }

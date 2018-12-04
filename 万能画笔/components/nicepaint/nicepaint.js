@@ -316,23 +316,18 @@ Component({
       })
       console.log(points);
       //封装画网格的参数对象
-      net.x = x, net.y = y, net.radius = radius;
+      net.x = x, net.y = y, net.radius = radius, net.lines = scores.length;
       //封装画中心多边形的参数对象
       polygon.x = x, polygon.y = y, polygon.points = points;
       //封装画顶点的参数对象
-      if (net.isArc) {
-        //对于圆形层框，分为三步,先画层框，再画中心多边形，最后画点  
-        this.drawNet(net);
-        this.drawCenterPolygon(polygon);
-      } else {
-        this.drawCenterPolygon(polygon);
-        net.lines = scores.length;
-        this.drawNet(net);
-      }
-      points.forEach((v) => {
+      this.drawNet(net);
+      this.drawCenterPolygon(polygon);
+
+      points.forEach((v, i) => {
         this.drawArc({
           x: v.x,
           y: v.y,
+          color: scores[i].color,
           ...vertex
         })
       })
@@ -367,6 +362,26 @@ Component({
           var index = count % colors.length;
           color = colors[index];
         }
+        if (isVertexLine || isPolygon) {
+          var locations = this.getRegularPolygonLocations({
+            x,
+            y,
+            radius: radius - count * interval,
+            lines
+          });
+        }
+
+        //画顶点到中心的连线
+        if (!isFill && isVertexLine && count == 0) {
+          locations.forEach((v) => {
+            this.ctx.moveTo(x, y);
+            this.ctx.lineTo(v.x, v.y);
+          })
+          this.ctx.setLineWidth(lineWidth);
+          this.ctx.setStrokeStyle(color);
+          this.ctx.stroke();
+        }
+
         if (isArc) { //绘制圆
 
           this.drawArc({
@@ -380,23 +395,6 @@ Component({
         }
         //绘制多边形
         if (isPolygon) {
-          var locations = this.getRegularPolygonLocations({
-            x,
-            y,
-            radius: radius - count * interval,
-            lines
-          });
-          //画顶点到中心的连线
-          if (isPolygon && !isFill && isVertexLine && count == 0) {
-            locations.forEach((v) => {
-              this.ctx.moveTo(x, y);
-              this.ctx.lineTo(v.x, v.y);
-            })
-            this.ctx.setLineWidth(lineWidth);
-            this.ctx.setStrokeStyle(color);
-            this.ctx.stroke();
-          }
-
           this.drawPolygon({
             isFill,
             points: locations,
@@ -438,7 +436,7 @@ Component({
       color = 'red',
       points,
     }) {
-      
+
       if (!points) return;
       this.ctx.save();
       if (isStroke) {
@@ -509,7 +507,7 @@ Component({
       color,
       lineWidth = 2
     }) {
-      
+      // console.log('绘制圆的颜色',color);
       this.ctx.save();
       this.ctx.beginPath();
       this.ctx.arc(x, y, radius, sA, eA, isClockwise);
