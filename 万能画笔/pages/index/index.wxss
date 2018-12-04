@@ -1,6 +1,6 @@
 /**index.wxss**/
 page{
-  background-color: green;
+  /* background-color: green; */
 }
 .myImage{
   width:50vh;

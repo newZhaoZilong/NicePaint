@@ -176,13 +176,26 @@ Page({
           width:200,
           height:200,
           views:[{
+            type: 'net',
+            x: 100,
+            y: 100,
+            radius: 80,
+            level: 5,
+            isArc: true,
+            isPolygon: false,
+            lineWidth: 3,
+            isFill:true,
+            colors: ['black','yellow', 'orange','white']
+          },{
             type:'net',
             x:100,
             y:100,
-            radius:100,
-            level:4,
+            radius:80,
+            level:5,
             isArc:true,
-            isPolygon:false
+            isPolygon:false,
+            lineWidth:5,
+            color:'white'
           }]
         }
       })
