@@ -86,7 +86,8 @@ Component({
                     })
                     this.triggerEvent('getImage', {
                       tempFilePath: res.tempFilePath,
-                      errMsg: 'canvasdrawer:ok'
+                      errMsg: 'canvasdrawer:ok',
+                      id: this.data.painting.id
                     })
                     console.log('全部元素绘制成功');
                   })
@@ -113,7 +114,7 @@ Component({
               })
               console.log('将图片下载到缓存失败');
             })
-        }, 100)
+        }, 300)
 
       });
 
@@ -163,7 +164,7 @@ Component({
       sWidth, //源图像的矩形选择框的宽度
       sHeight, //源图像的矩形选择框的高度
       shadow, //阴影,是个字符串类似'2 2 1 gray'
-      borderRadius //阴影和borderRadius不能共存,都设置的话，取borderRadius
+      borderRadius //borderRadius
     }) {
       //直接从缓存中取路径
       var path = this.data.cache[url];
@@ -208,23 +209,38 @@ Component({
       left = 0, //文字位于画布的x坐标
       top = 0, //文字位于画布的y坐标
       width, //文字的宽度，用于换行的
-      lineHeight = 20, //文字的行高,
+      lineHeight, //文字的行高,
       textAlign = 'left', //文字
       textBaseline = 'top',
-      font //如果定义了font，那么fontSize无效，font-weight只有normal和bold两个有效
+      fontWeight = 'normal',
+      shadow
+      // font //如果定义了font，那么fontSize无效，font-weight只有normal和bold两个有效
       //font是字符串格式类似,必须是30px而不是只有30这个数字   ‘bold 30px Arial‘
     }) {
+      if (!lineHeight){
+        lineHeight = fontSize * 1.25;
+      }
 
       this.ctx.save();
-
+      if (shadow) {
+        var shadow_list = shadow.split(' ');
+        if (shadow_list.length < 3) {
+          console.log('shadow4个属性必须全部填写!!!!!!!!!');
+        }
+        this.ctx.setShadow(...shadow_list);
+      }
+      
       this.ctx.setTextBaseline(textBaseline);
       this.ctx.setTextAlign(textAlign);
       this.ctx.setFillStyle(color);
-      if (font) {
-        this.ctx.font = font;
-      } else {
-        this.ctx.setFontSize(fontSize);
-      }
+
+      var font_str = `${fontWeight} ${fontSize}px Arial`
+      this.ctx.font = font_str;
+      // if (fontWeight) {
+      //   this.ctx.font = font;
+      // } else {
+      //   this.ctx.setFontSize(fontSize);
+      // }
 
       var lineFontNumber = content.length; //字符个数
       var fillText = ''; //累加字符串
@@ -260,8 +276,8 @@ Component({
      * 绘制rect,可能是瞄边，也可能是填充
      */
     drawRect({
-      top = 0,
       left = 0,
+      top = 0,
       width = this.data.canvasWidth,
       height = this.data.canvasHeight,
       isFill = true,
@@ -276,11 +292,11 @@ Component({
       }
       if (isFill) {
         this.ctx.setFillStyle(color);
-        this.ctx.fillRect(top, left, width, height);
+        this.ctx.fillRect(left,top , width, height);
 
       } else {
         this.ctx.setStrokeStyle(color);
-        this.ctx.strokeRect(top, left, width, height);
+        this.ctx.strokeRect(left,top,  width, height);
       }
 
       this.ctx.restore();
@@ -296,6 +312,9 @@ Component({
     drawAbilityChart({
       x,
       y,
+      isNet, //是否有网格
+      isTransparent, //是否是透明的，其实就是网格在上，不透明是网格在下
+      isCenter = true,//是否需要中心点，为false的话，就直接画个多边形
       radius, //半径
       scores, //能力值数组,必须写颜色,和能力值
       net = {}, //网格配置
@@ -316,12 +335,61 @@ Component({
       })
       console.log(points);
       //封装画网格的参数对象
-      net.x = x, net.y = y, net.radius = radius, net.lines = scores.length;
+      // net.x = x, net.y = y, net.radius = radius, net.lines = scores.length;
       //封装画中心多边形的参数对象
-      polygon.x = x, polygon.y = y, polygon.points = points;
+      // polygon.x = x, polygon.y = y, polygon.points = points;
       //封装画顶点的参数对象
-      this.drawNet(net);
-      this.drawCenterPolygon(polygon);
+
+      if (isTransparent) {
+        if (isCenter){
+          this.drawCenterPolygon({
+            x,
+            y,
+            points,
+            ...polygon
+          });
+        }else{
+          this.drawPolygon({
+            points,
+            ...polygon
+          })
+        }
+        
+        if (isNet) {
+          this.drawNet({
+            x,
+            y,
+            radius,
+            lines: scores.length,
+            ...net
+          });
+        }
+
+      } else {
+        if (isNet) {
+          this.drawNet({
+            x,
+            y,
+            radius,
+            lines: scores.length,
+            ...net
+          });
+        }
+        if (isCenter) {
+          this.drawCenterPolygon({
+            x,
+            y,
+            points,
+            ...polygon
+          });
+        } else {
+          this.drawPolygon({
+            points,
+            ...polygon
+          })
+        }
+      }
+
 
       points.forEach((v, i) => {
         this.drawArc({
@@ -383,14 +451,14 @@ Component({
         }
 
         if (isArc) { //绘制圆
-
           this.drawArc({
             isFill,
             x,
             y,
             radius: radius - count * interval,
             color,
-            lineWidth
+            lineWidth,
+            isStroke: !isFill
           });
         }
         //绘制多边形
@@ -433,8 +501,9 @@ Component({
       isStroke = true, //描边
       lineWidth = 10,
       lineColor = 'white', //边框颜色
-      color = 'red',
+      color,
       points,
+      
     }) {
 
       if (!points) return;
@@ -453,8 +522,11 @@ Component({
         this.ctx.lineTo(points[nextIndex].x, points[nextIndex].y);
         this.ctx.lineTo(x, y);
         this.ctx.closePath();
+
         if (isFill) {
-          this.ctx.setFillStyle(points[i].color || color);
+          this.ctx.setFillStyle(color || points[i].color);
+          this.ctx.setFillStyle(color || points[i].color);
+          console.log('当前三角形颜色', color || points[i].color);
           this.ctx.fill();
         }
         if (isStroke) {
@@ -498,6 +570,7 @@ Component({
      */
     drawArc({
       isFill = true,
+      isStroke = false,
       x = 10,
       y = 10,
       radius = 20,
@@ -505,7 +578,8 @@ Component({
       eA = Math.PI * 2,
       isClockwise = false,
       color,
-      lineWidth = 2
+      lineWidth = 2,
+      lineColor
     }) {
       // console.log('绘制圆的颜色',color);
       this.ctx.save();
@@ -514,12 +588,15 @@ Component({
       this.ctx.closePath();
       if (isFill) {
         this.ctx.setFillStyle(color);
+        this.ctx.setFillStyle(color);
         this.ctx.fill();
-      } else {
+      }
+      if (isStroke){
         this.ctx.setLineWidth(lineWidth);
-        this.ctx.setStrokeStyle(color);
+        this.ctx.setStrokeStyle(lineColor || color);
         this.ctx.stroke();
       }
+
       this.ctx.restore();
       console.log('绘制圆弧成功');
     },
@@ -549,7 +626,7 @@ Component({
       var count = 0;
       var list = [];
       while (count < lines) {
-        var A = (startA + count * intervalA) % (Math.PI * 2)
+        var A = (startA - count * intervalA) % (Math.PI * 2)
         var point_radius = rates ? radius * rates[count] / 100 : radius;
         list.push(this.getLocation(x, y, A, point_radius));
         count++;

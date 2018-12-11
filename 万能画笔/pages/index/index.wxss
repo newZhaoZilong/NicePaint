@@ -1,25 +1,8 @@
 /**index.wxss**/
-page{
-  /* background-color: green; */
-}
-.myImage{
-  width:50vh;
-  height:50vh;
-  /* background-color:red; */
-}
-.ability-container {
-  position: relative;
-  margin-top: 2.8vh;
-  width: 42.4vh;
-  height: 29.8vh;
-  /* background-color: red; */
-}
-.ability-sanwei{
-  position: absolute;
-  left:50%;
-  top:50%;
-  transform: translate(-50%, -50%);
-  width:18.2vh;
-  height:18.2vh;
-  /* background-color: black; */
+
+.ability-sanwei {
+  margin:10rpx 0 0 150rpx;
+  width: 450rpx;
+  height: 450rpx;
+  border: 1rpx solid #dedede;
 }

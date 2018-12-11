@@ -2,7 +2,6 @@
 <button type="primary" bindtap="drawNet">绘制网格</button>
 <button type="primary" bindtap="drawPolygon">绘制中心多边形</button>
 <button type="primary" bindtap="drawChart">绘制能力表</button>
-<view class="ability-container">
-<image src="{{netUrl}}" class="ability-sanwei"></image>
-</view>
+<button type="primary" bindtap="drawHaibao">绘制海报</button>
+<image src="{{imgUrl}}" class="ability-sanwei"></image>
 <nicepaint painting="{{painting}}" bind:getImage="getImage"></nicepaint>
