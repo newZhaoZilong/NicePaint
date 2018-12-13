@@ -16,7 +16,7 @@ Component({
               showCanvas: true,
               isPainting: true
             }, () => {
-              this.readyPigment()
+              this.readyToDraw()
             })
           }
         }
@@ -57,24 +57,24 @@ Component({
     /**
      * 开始绘制,基本步骤就是
      * 首先设置canvas宽高,
-     * 然后预先下载所有图片存储到缓存
-     * 然后开始同步绘制views,
+     * 然后预先下载所有图片存储到缓存,(这一步如果图片太多可以提前调用downloadAllImageToCache将图片预先下载到本地)
+     * 然后开始同步绘制元素views,
      * 绘制完views后将图片保存到本地，获取本地临时路径,
-     * 然后关闭canvas，并触发冒泡函数,将路径输出出去
+     * 然后隐藏canvas，并触发冒泡函数,将路径输出出去
      */
-    readyPigment() {
+    readyToDraw() {
       const {
         width,
         height,
         views,
       } = this.data.painting;
-      // console.log('当前页面的width,height,views', width, height, views)
       this.setData({
         canvasWidth: width,
         canvasHeight: height,
       }, () => {
-        setTimeout(() => { //调用drawElements绘制图片     
-          this.downloadAllImageToCache(views)
+        //这里如果不延时的话，安卓手机容易出错，错误现象是图片变形，就是canva的宽高并没有设置成功
+        setTimeout(() => {
+          this.downloadAllImageToCache(views, 'url')
             .then(() => {
               this.drawElements(views);
               this.ctx.draw(this.data.painting.clear || this.data.clear, () => {
@@ -97,42 +97,44 @@ Component({
                       isPainting: false,
                     })
                     this.triggerEvent('getImage', {
-                      errMsg: 'canvasdrawer:fail'
+                      errMsg: res.message
                     })
-                    console.log('将图片从canvas上截取到本地失败');
                   })
               })
             })
-            .catch(() => {
+            .catch((res) => {
               this.setData({
                 //如果改为true,连续绘制就会出错
                 showCanvas: false,
                 isPainting: false,
               })
               this.triggerEvent('getImage', {
-                errMsg: 'canvasdrawer:fail'
+                errMsg: res.message
               })
-              console.log('将图片下载到缓存失败');
             })
         }, 300)
-
       });
-
     },
     /**
      * 将图片加载到缓存
      */
-    downloadAllImageToCache(list) {
-      var imglist = [];
+    downloadAllImageToCache(list, key) {
+      var imgPromiselist = [];
       for (var i = 0; i < list.length; i++) {
-        if (list[i].type == 'image') {
-          imglist.push(this.getImagePath(list[i].url));
+        var imgUrl;
+        if (key) {
+          imgUrl = list[i][key];
+        } else {
+          imgUrl = list[i];
+        }
+        if (imgUrl) {
+          imgPromiselist.push(this.getImagePath(imgUrl));
         }
       }
-      return Promise.all(imglist);
+      return Promise.all(imgPromiselist);
     },
     /**
-     * 遍历数组一次性绘制多个元素
+     * 遍历数组一次性绘制list中的所有元素
      */
     drawElements(list) {
       for (var i = 0; i < list.length; i++) {
@@ -143,15 +145,16 @@ Component({
     /**
      * drawElement是绘制单一元素的统一方法
      * 需要传入一个对象，对象必须有type属性，这样才能指定对应的
-     * 绘制方法，config参数对象其实就是drawImage,drawText传入的对象多了一个type属性
+     * 绘制方法，config参数对象其实就是drawImage,drawText传入的参数对象多了一个type属性
      */
     drawElement(config) {
-      console.log('元素类型', config.type);
+      console.log('将要绘制的元素类型', config.type);
       return this.data.canvasHandle[config.type].call(this, config);
     },
 
     /**
-     * 绘制图片的方法，sx,sy,sWidth,sHeight四个属性是选择图片的部分区域画到画布上
+     * 绘制图片的方法,如果有圆角边框而且还有阴影的话,会首先绘制阴影然后使用clip指定绘制区域，
+     * 然后绘制图片
      */
     drawImage({
       url, //图片url地址，可以是本地路径，也可以是网络路径
@@ -164,25 +167,22 @@ Component({
       sWidth, //源图像的矩形选择框的宽度
       sHeight, //源图像的矩形选择框的高度
       shadow, //阴影,是个字符串类似'2 2 1 gray'
-      borderRadius //borderRadius
+      borderRadius //圆角边框,只支持不大于0.5的小数，例如0.5,0.4，是相对于高度,0.5会切成圆
     }) {
       //直接从缓存中取路径
       var path = this.data.cache[url];
       //如果不保存之前的绘图上下文的画，那么绘制阴影后，会影响到之后绘制的
       //图片
       this.ctx.save();
+      this.setShadow(shadow);
       if (borderRadius) {
-        this.clipBorder(left, top, width, height, borderRadius, shadow);
-      }
-
-      if (shadow && !borderRadius) {
-        var shadow_list = shadow.split(' ');
-        if (shadow_list.length < 3) {
-          console.log('shadow4个属性必须全部填写!!!!!!!!!');
+        this.createBorderRadiusPath(left, top, width, height, borderRadius);
+        if (shadow) {
+          //这一步是为了绘制阴影
+          this.ctx.fill();
         }
-        this.ctx.setShadow(...shadow_list);
+        this.ctx.clip();
       }
-
 
       if (sx) {
         this.ctx.drawImage(path, sx, sy, sWidth, sHeight, left, top, width, height);
@@ -191,7 +191,7 @@ Component({
       } else {
         this.ctx.drawImage(path, left, top);
       }
-      //save+restore相当于重制之前的绘图上下文
+      //save+restore相当于重置之前的绘图上下文
       //避免设置的属性影响到其他图片
       this.ctx.restore();
       console.log('绘制图片成功', url);
@@ -208,39 +208,27 @@ Component({
       fontSize = 16, //文字的尺寸
       left = 0, //文字位于画布的x坐标
       top = 0, //文字位于画布的y坐标
-      width, //文字的宽度，用于换行的
+      width, //文字的宽度，用于换行的,如果添加width，文字超出宽度时就会换行,不写width属性不会换行
       lineHeight, //文字的行高,
-      textAlign = 'left', //文字
-      textBaseline = 'top',
-      fontWeight = 'normal',
-      shadow
-      // font //如果定义了font，那么fontSize无效，font-weight只有normal和bold两个有效
-      //font是字符串格式类似,必须是30px而不是只有30这个数字   ‘bold 30px Arial‘
+      textAlign = 'left', //文字对齐方式
+      textBaseline = 'top', //文字相对于基线位置
+      fontWeight = 'normal', //文本的粗细,只有normal和bold可用
+      shadow //阴影,是个字符串类似'2 2 1 gray'
     }) {
-      if (!lineHeight){
+      if (!lineHeight) {
         lineHeight = fontSize * 1.25;
       }
 
       this.ctx.save();
-      if (shadow) {
-        var shadow_list = shadow.split(' ');
-        if (shadow_list.length < 3) {
-          console.log('shadow4个属性必须全部填写!!!!!!!!!');
-        }
-        this.ctx.setShadow(...shadow_list);
-      }
-      
+
+      this.setShadow(shadow);
+
       this.ctx.setTextBaseline(textBaseline);
       this.ctx.setTextAlign(textAlign);
       this.ctx.setFillStyle(color);
 
       var font_str = `${fontWeight} ${fontSize}px Arial`
       this.ctx.font = font_str;
-      // if (fontWeight) {
-      //   this.ctx.font = font;
-      // } else {
-      //   this.ctx.setFontSize(fontSize);
-      // }
 
       var lineFontNumber = content.length; //字符个数
       var fillText = ''; //累加字符串
@@ -273,49 +261,54 @@ Component({
 
     },
     /**
-     * 绘制rect,可能是瞄边，也可能是填充
+     * 绘制rect,可能是描边，也可能是填充
      */
     drawRect({
       left = 0,
       top = 0,
-      width = this.data.canvasWidth,
-      height = this.data.canvasHeight,
-      isFill = true,
-      lineWidth = 10,
+      width = 100,
+      height = 100,
+      isFill = true, //是否填充    
       color = 'red',
-      borderRadius
+      isStroke = false, //是否描边,都为true的时候相当于添加了一个边框
+      lineWidth = 10,
+      lineColor,
+      borderRadius = 0, //圆角边框，只接受小数,类似0.5会被切成一个圆
+      shadow
     }) {
 
       this.ctx.save();
-      if (borderRadius) {
-        this.clipBorder(left, top, width, height, borderRadius);
-      }
+      this.setShadow(shadow);
+      this.createBorderRadiusPath(left, top, width, height, borderRadius);
+
       if (isFill) {
         this.ctx.setFillStyle(color);
-        this.ctx.fillRect(left,top , width, height);
-
-      } else {
-        this.ctx.setStrokeStyle(color);
-        this.ctx.strokeRect(left,top,  width, height);
+        this.ctx.fill();
+        this.setShadow(null);
+      }
+      if (isStroke) {
+        this.ctx.setLineWidth(lineWidth);
+        this.ctx.setStrokeStyle(lineColor || color);
+        this.ctx.stroke();
       }
 
       this.ctx.restore();
-      console.log('绘制长方形成功');
+      console.log('绘制矩形成功');
 
     },
     /**
      * 绘制能力表,需要传入中心点坐标,
      * 能力值的对象数组scores,每个对象有一个
      * score能力值属性,
-     * color对应的颜色
+     * color对应的颜色,例如[{score:80,color:'red'},{score:70,color:'red'}]
      */
     drawAbilityChart({
-      x,
-      y,
+      x, //中心点x坐标
+      y, //中心点y坐标
       isNet, //是否有网格
-      isTransparent, //是否是透明的，其实就是网格在上，不透明是网格在下
-      isCenter = true,//是否需要中心点，为false的话，就直接画个多边形
-      radius, //半径
+      isTransparent, //是否是透明的，其实就是网格在上，看起来像透明的,false不透明是网格在下
+      isCenter = true, //是否需要中心点，为false的话，就直接画个多边形
+      radius = 100, //半径
       scores, //能力值数组,必须写颜色,和能力值
       net = {}, //网格配置
       polygon = {}, //中心多边形配置
@@ -341,20 +334,20 @@ Component({
       //封装画顶点的参数对象
 
       if (isTransparent) {
-        if (isCenter){
+        if (isCenter) {
           this.drawCenterPolygon({
             x,
             y,
             points,
             ...polygon
           });
-        }else{
+        } else {
           this.drawPolygon({
             points,
             ...polygon
           })
         }
-        
+
         if (isNet) {
           this.drawNet({
             x,
@@ -404,33 +397,36 @@ Component({
 
     /**
      * 绘制同心圆或者同心正多边形,可设置层级,
-     * 同心圆和同心正多边形可一块绘制
+     * 同心圆和同心正多边形可一块绘制,
+     * 绘制方法是首先循环层级，从最外层开始
+     * 依次获取每个层级的坐标然后绘制，由最外层绘制到最内层
      */
     drawNet({
       x,
       y,
-      radius,
+      radius = 100,
       isFill = false,
+      isStroke = true,
       level = 1, //层级
       lineWidth = 1, //线宽
       color = 'red',
-      colors,
+      colors, //颜色数组,如果此属性存在,color无效,['yellow','red','green']
       lines = 4,
-      isArc = false,
-      isPolygon = true,
-      isVertexLine = true
+      isArc = false, //是否绘制圆
+      isPolygon = true, //是否绘制正多边形
+      isVertexLine = true //是否绘制中心点到顶点的连线
     }) {
 
       this.ctx.save();
       var interval = radius / level;
       var count = 0;
 
-      while (radius - count * interval > 0) {
+      while (count < level) {
         if (colors && colors.length > 0) {
           var index = count % colors.length;
           color = colors[index];
         }
-        if (isVertexLine || isPolygon) {
+        if (isPolygon || (isVertexLine && count == 0)) {
           var locations = this.getRegularPolygonLocations({
             x,
             y,
@@ -463,6 +459,10 @@ Component({
         }
         //绘制多边形
         if (isPolygon) {
+
+
+
+
           this.drawPolygon({
             isFill,
             points: locations,
@@ -502,11 +502,13 @@ Component({
       lineWidth = 10,
       lineColor = 'white', //边框颜色
       color,
-      points,
-      
+      points, //顶点的坐标数组，[{x:10,y:10,color:'red'},{x:100,y:10,color:'green'},{x:50,y:200,color:'blue'}]
     }) {
 
-      if (!points) return;
+      if (!points) {
+        console.log('绘制中心多边形points是必须的!', points);
+        return;
+      };
       this.ctx.save();
       if (isStroke) {
         //设置线条的结束交点样式
@@ -526,7 +528,7 @@ Component({
         if (isFill) {
           this.ctx.setFillStyle(color || points[i].color);
           this.ctx.setFillStyle(color || points[i].color);
-          console.log('当前三角形颜色', color || points[i].color);
+          // console.log('当前三角形颜色', color || points[i].color);
           this.ctx.fill();
         }
         if (isStroke) {
@@ -541,14 +543,20 @@ Component({
      * 绘制多边形
      */
     drawPolygon({
-      isFill = true,
-      lineWidth = 10,
-      color = 'red',
-      points,
+      isFill = true, //是否填充
+      color = 'red', //填充颜色
+      isStroke = false, //是否描边
+      lineWidth = 10, //边框宽度
+      lineColor, //如果不写默认是color
+      points, //坐标数组类似[{x:10,y:10},{x:100,y:10},{x:50,y:100}]
+      shadow,
+      lineJoin//设置线条的交点样式,有bevel斜角 round 圆角,miter尖角
     }) {
       if (!points) return;
       this.ctx.save();
-      this.ctx.beginPath();
+      this.setShadow(shadow);
+      this.ctx.setLineJoin(lineJoin)
+      this.ctx.beginPath();  
       for (var i = 0; i < points.length; i++) {
         this.ctx.lineTo(points[i].x, points[i].y);
       }
@@ -556,9 +564,11 @@ Component({
       if (isFill) {
         this.ctx.setFillStyle(color);
         this.ctx.fill();
-      } else {
+        this.setShadow(null);
+      }
+      if (isStroke) {
         this.ctx.setLineWidth(lineWidth);
-        this.ctx.setStrokeStyle(color);
+        this.ctx.setStrokeStyle(lineColor || color);
         this.ctx.stroke();
       }
       this.ctx.restore();
@@ -573,7 +583,7 @@ Component({
       isStroke = false,
       x = 10,
       y = 10,
-      radius = 20,
+      radius = 30,
       sA = 0,
       eA = Math.PI * 2,
       isClockwise = false,
@@ -591,7 +601,7 @@ Component({
         this.ctx.setFillStyle(color);
         this.ctx.fill();
       }
-      if (isStroke){
+      if (isStroke) {
         this.ctx.setLineWidth(lineWidth);
         this.ctx.setStrokeStyle(lineColor || color);
         this.ctx.stroke();
@@ -614,7 +624,8 @@ Component({
       radius, //半径
       lines, //边数
       rates, //每个点所占半径的比率，是一个数字数组例如[25,80],代表两个点各占半径的25%和80%，当rates不为空时,lines无效,rates不能写空数组
-      startA = Math.PI * 1.5
+      startA = Math.PI * 1.5, //开始的弧度,
+      isClockwise = false //false是逆时针,true为正湿疹
     }) {
       if (rates) {
         if (rates.length == 0) {
@@ -626,7 +637,7 @@ Component({
       var count = 0;
       var list = [];
       while (count < lines) {
-        var A = (startA - count * intervalA) % (Math.PI * 2)
+        var A = isClockwise ? startA + count * intervalA : startA - count * intervalA //% (Math.PI * 2)
         var point_radius = rates ? radius * rates[count] / 100 : radius;
         list.push(this.getLocation(x, y, A, point_radius));
         count++;
@@ -638,8 +649,8 @@ Component({
      */
     getLocation(x, y, A, radius) {
       return {
-        x: x + radius * Math.cos(A),
-        y: y + radius * Math.sin(A)
+        x: Math.round(x + radius * Math.cos(A)),
+        y: Math.round(y + radius * Math.sin(A))
       }
     },
     /**
@@ -674,25 +685,10 @@ Component({
      * clip=false是用于绘制阴影
      */
     clipBorder(left, top, width, height, borderRadius, shadow) {
-      if (borderRadius > 0.5) {
-        return;
-      }
-      var radius = height * borderRadius;
-      this.ctx.beginPath();
-      //画左上角
-      this.ctx.moveTo(left + width - radius, top);
-      this.ctx.arc(left + width - radius, top + radius, radius, 1.5 * Math.PI, 0);
-      //画右下角
-      this.ctx.lineTo(left + width, top + height - radius);
-      this.ctx.arc(left + width - radius, top + height - radius, radius, 0, 0.5 * Math.PI);
-      //画左下角
-      this.ctx.lineTo(left + radius, top + height);
-      this.ctx.arc(left + radius, top + height - radius, radius, 0.5 * Math.PI, Math.PI);
-      //画左上角
-      this.ctx.lineTo(left, top + radius);
-      this.ctx.arc(left + radius, top + radius, radius, Math.PI, 1.5 * Math.PI);
 
-      this.ctx.closePath();
+
+      this.createBorderRadiusPath(left, top, width, height, borderRadius);
+
       if (shadow) {
         var shadow_list = shadow.split(' ');
         //shadow4个属性必须全部填写
@@ -701,6 +697,57 @@ Component({
         this.ctx.fill();
       }
       this.ctx.clip();
+    },
+    /**
+     * 设置阴影
+     */
+    setShadow(shadow) {
+      if (shadow) {
+        var shadow_list = shadow.split(' ');
+        if (shadow_list.length < 3) {
+          console.log('shadow4个属性必须全部填写!!!!!!!!!');
+        }
+        this.ctx.setShadow(...shadow_list);
+      } else {
+        console.log('清除阴影');
+        this.ctx.setShadow(0, 0, 0, 'black');
+      }
+    },
+    /**
+     * 内部用的绘制圆角，borderRadius的值为0.5时，是圆形
+     */
+    createBorderRadiusPath(left, top, width, height, borderRadius) {
+      // if (borderRadius > 0.5) {
+      //   console.log('borderRadius的值不能大于0.5');
+      //   return;
+      // }
+
+      var radius = height * borderRadius;
+      this.ctx.beginPath();
+      //画右下角
+      this.ctx.lineTo(left + width, top + height - radius);
+      if (borderRadius) {
+        this.ctx.arc(left + width - radius, top + height - radius, radius, 0, 0.5 * Math.PI);
+      }
+
+      //画左下角
+      this.ctx.lineTo(left + radius, top + height);
+      if (borderRadius) {
+        this.ctx.arc(left + radius, top + height - radius, radius, 0.5 * Math.PI, Math.PI);
+      }
+
+      //画左上角
+      this.ctx.lineTo(left, top + radius);
+      if (borderRadius) {
+        this.ctx.arc(left + radius, top + radius, radius, Math.PI, 1.5 * Math.PI);
+      }
+      //画右上角
+      this.ctx.lineTo(left + width - radius, top);
+      if (borderRadius) {
+        this.ctx.arc(left + width - radius, top + radius, radius, 1.5 * Math.PI, 0);
+      }
+
+      this.ctx.closePath();
     },
 
 
@@ -725,10 +772,9 @@ Component({
               complete: res => {
                 if (res.errMsg === 'getImageInfo:ok') {
                   this.data.cache[url] = res.path;
-                  console.log('下载图片成功', this.data.cache[url])
                   resolve(res.path);
                 } else {
-                  reject('getImagePath fail');
+                  reject('下载图片到本地失败');
                 }
               }
             })
@@ -742,7 +788,7 @@ Component({
 
 
     /**
-     * 输出图片路径
+     * 将canvas绘制的图片保存到本地,并输出图片路径
      */
     saveImageToLocal() {
       const {
@@ -760,7 +806,7 @@ Component({
             if (res.errMsg === 'canvasToTempFilePath:ok') {
               resolve(res);
             } else {
-              reject(res);
+              reject('将canvas绘制的图片保存到本地失败');
             }
           }
         }, this)

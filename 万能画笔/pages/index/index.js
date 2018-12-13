@@ -14,6 +14,70 @@ Page({
   },
 
   /**
+   * 绘制矩形
+   */
+  drawRect() {
+    this.setData({
+      painting: {
+        width: 200, //画布宽，也是导出图片的尺寸
+        height: 200, //画布高
+        views: [{
+          type: 'rect', //绘制网格
+          left: 0,
+          top: 0,
+          width: 200,
+          height: 200,
+          color: 'pink'
+        }, {
+          type: 'rect', //绘制网格
+          left: 20,
+          top: 50,
+          width: 150,
+          height: 100,
+          color: 'blue',
+          isStroke: true, //是否描边，默认false
+          lineColor: 'red', //边框颜色,默认color
+          borderRadius: 0.3, //圆角边框，默认为0
+          shadow: '30 30 2 black' //阴影
+        }]
+      }
+    })
+  },
+  /**
+   * 绘制多边形
+   */
+  drawPolygon() {
+    this.setData({
+      painting: {
+        width: 200, //画布宽，也是导出图片的尺寸
+        height: 200, //画布高
+        views: [{
+          type: 'polygon', //绘制网格
+          color: 'yellow', //填充颜色
+          isFill: true, //是否填充
+          isStroke: true, //是否描边
+          lineColor: 'red', //边框颜色,不写和color一样
+          shadow: '5 5 10 black', //阴影，因为描边是覆盖在在填充上,所以'1 1 0 black'会被描边覆盖
+          lineJoin: 'round', //设置线条的交点样式，有bevel斜角和round圆角和miter尖角
+          points: [{ //points里是4个顶点的坐标
+            x: 10,
+            y: 10,
+          }, {
+            x: 150,
+            y: 10,
+          }, {
+            x: 150,
+            y: 120,
+          }, {
+            x: 10,
+            y: 190,
+          }]
+
+        }]
+      }
+    })
+  },
+  /**
    * 绘制网格
    */
   drawNet() {
@@ -43,7 +107,7 @@ Page({
   /**
    * 绘制中心多边形
    */
-  drawPolygon() {
+  drawCenterPolygon() {
     this.setData({
       painting: {
         width: 200, //画布宽，也是导出图片的尺寸
@@ -65,7 +129,7 @@ Page({
           }, {
             x: 150,
             y: 120,
-            color: 'orange'
+            color: 'black'
           }, {
             x: 10,
             y: 190,
@@ -84,7 +148,7 @@ Page({
       color: 'red'
     }, {
       score: '70',
-      color: 'orange'
+      color: 'yellow'
     }, {
       score: '80',
       color: 'blue'
@@ -160,12 +224,21 @@ Page({
         }, {
           type: 'image',
           url: this.data.imgUrl2,
-          left: 220,
-          top: 220,
+          left: 250,
+          top: 250,
+          width: 200,
+          height: 200,
+          // borderRadius: 0.5,
+          // shadow: '30 30 10 gray'
+        }, {
+          type: 'image',
+          url: this.data.imgUrl2,
+          left: 10,
+          top: 250,
           width: 200,
           height: 200,
           borderRadius: 0.5,
-          shadow: '30 30 10 gray'
+          // shadow: '30 30 10 gray'
         }]
       }
     })
@@ -175,6 +248,7 @@ Page({
    * 获取到返回的图片
    */
   getImage(e) {
+    console.log('绘制图片结果', e);
     this.setData({
       imgUrl: e.detail.tempFilePath
     })

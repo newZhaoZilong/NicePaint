@@ -1,6 +1,8 @@
 <!--index.wxml-->
+<button type="primary" bindtap="drawRect">绘制矩形</button>
+<button type="primary" bindtap="drawPolygon">绘制多边形</button>
 <button type="primary" bindtap="drawNet">绘制网格</button>
-<button type="primary" bindtap="drawPolygon">绘制中心多边形</button>
+<button type="primary" bindtap="drawCenterPolygon">绘制中心多边形</button>
 <button type="primary" bindtap="drawChart">绘制能力表</button>
 <button type="primary" bindtap="drawHaibao">绘制海报</button>
 <image src="{{imgUrl}}" class="ability-sanwei"></image>
