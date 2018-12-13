@@ -460,9 +460,6 @@ Component({
         //绘制多边形
         if (isPolygon) {
 
-
-
-
           this.drawPolygon({
             isFill,
             points: locations,
