@@ -10,8 +10,12 @@ Page({
   },
 
   onLoad: function() {
+      
+     
 
   },
+
+
 
   /**
    * 绘制矩形

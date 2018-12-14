@@ -2,7 +2,8 @@
   "pages":[
     "pages/index/index",
     "pages/haibao/haibao",
-    "pages/sanwei/sanwei"
+    "pages/sanwei/sanwei",
+    "pages/prepare/prepare"
   ],
   "window":{
     "backgroundTextStyle":"light",

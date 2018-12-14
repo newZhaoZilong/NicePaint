@@ -1,0 +1,3 @@
+<!--pages/prepare/prepare.wxml-->
+<canvas class="mycanvas" canvas-id="mycanvas"></canvas>
+<button type="primary" bindtap="drawcanvas">绘制</button>
