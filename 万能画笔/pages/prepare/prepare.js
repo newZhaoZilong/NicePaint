@@ -12,7 +12,7 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function(options) {
-
+    this.ctx = wx.createCanvasContext("mycanvas", this);
   },
   /**
    * 绘制canvas
@@ -33,7 +33,32 @@ Page({
     var distance = this.getDistance(10,10,100,100);
     var a = this.getA(10, 10, 100, 100);
     var distance1 = this.getLocation(10, 10, a, distance - borderRadius);
-    
+    console.log(distance1)
+    this.ctx.beginPath();
+    this.ctx.lineTo(10,10);
+    this.ctx.lineTo(distance1.x, distance1.y);
+
+    // var b1 = this.getJoinA(10, 10, 100, 100,10,190);
+    // console.log(b1);
+
+    // var c1 = Math.PI - b1 + this.getA(10, 10, 100, 100);
+
+    // var arcLocation = this.getLocation(distance1.x, distance1.y, c1, borderRadius);
+
+    // console.log('圆心位置',arcLocation);
+
+    // // this.ctx.arc(arcLocation.x, arcLocation.y, borderRadius, c1 + Math.PI, c1 + Math.PI + b1)
+    // var d1 = this.getA(100, 100, 10, 190);
+    // var nextLocation = this.getLocation(100, 100, d1,borderRadius);
+
+    // console.log(arcLocation.x, arcLocation.y, nextLocation.x, nextLocation.y);
+    // this.ctx.lineTo(80, 10);
+    this.ctx.arcTo(100, 100, 10, 190, 60);
+
+    this.ctx.setStrokeStyle('black');
+    this.ctx.setLineWidth(10);
+    this.ctx.stroke();
+    this.ctx.draw();
     console.log(distance1);
 
   },
@@ -104,8 +129,8 @@ Page({
       //在第四区域,包括上坐标,负值
       A = 2 * Math.PI + A;
     }
-    //* 180 / Math.PI
-    return A * 180 / Math.PI
+    //* 180 / Math.PI//* 180 / Math.PI
+    return A 
   },
   /**
    * 根据两点坐标计算出距离
