@@ -17,49 +17,136 @@ Page({
   /**
    * 绘制canvas
    */
-  drawcanvas() {
+  drawcanvas2() {
+    var borderRadius = 30;
     var points = [{
-      x: 10,
-      y: 10
-    }, {
       x: 100,
-      y: 100
+      y: 50
     }, {
-      x: 10,
-      y: 190
+      x: 200,
+      y: 50
+    }, {
+      x: 200,
+      y: 200
+    }, {
+        x: 100,
+        y: 200
     }];
-    var borderRadius = 20;
-
-    var distance = this.getDistance(10,10,100,100);
-    var a = this.getA(10, 10, 100, 100);
-    var distance1 = this.getLocation(10, 10, a, distance - borderRadius);
-    console.log(distance1)
     this.ctx.beginPath();
-    this.ctx.lineTo(10,10);
-    this.ctx.lineTo(distance1.x, distance1.y);
+    var len = points.length;
+    for (var i = 0; i < len; i++) {
+      var {
+        x:x1,
+        y:y1
+      } = points[i];
+      var {
+        x: x2,
+        y: y2
+      } = points[(i + 1) % len];
+      var {
+        x: x3,
+        y: y3
+      } = points[(i + 2) % len];
 
-    // var b1 = this.getJoinA(10, 10, 100, 100,10,190);
-    // console.log(b1);
+      //起点坐标
+      var {
+        x:sX,
+        y:sY
+      } = this.getLocation(x1, y1, this.getA(x1, y1, x2, y2), borderRadius);;
+      this.ctx.lineTo(sX, sY);
+      //计算出第一条线和x轴的夹角
+      var a1 = this.getA(x2, y2, x1, y1)
+      //首先计算出下个点的坐标
+      var {
+        x:nX,
+        y:nY
+      } = this.getLocation(x2, y2, a1, borderRadius);
+      this.ctx.lineTo(nX, nY);
+      //计算出第二条线和x轴的夹角
+      var a2 = this.getA(x2, y2, x3, y3);
+      var {
+        x:aX,
+        y:aY
+      } = this.getLocation(nX, nY, a2, borderRadius);
 
-    // var c1 = Math.PI - b1 + this.getA(10, 10, 100, 100);
+      //绘制圆弧
 
-    // var arcLocation = this.getLocation(distance1.x, distance1.y, c1, borderRadius);
-
-    // console.log('圆心位置',arcLocation);
-
-    // // this.ctx.arc(arcLocation.x, arcLocation.y, borderRadius, c1 + Math.PI, c1 + Math.PI + b1)
-    // var d1 = this.getA(100, 100, 10, 190);
-    // var nextLocation = this.getLocation(100, 100, d1,borderRadius);
-
-    // console.log(arcLocation.x, arcLocation.y, nextLocation.x, nextLocation.y);
-    // this.ctx.lineTo(80, 10);
-    this.ctx.arcTo(100, 100, 10, 190, 60);
+      this.ctx.arc(aX, aY, borderRadius, a2 + Math.PI, a1 + Math.PI);
+    }
+    this.ctx.closePath();
+   
 
     this.ctx.setStrokeStyle('black');
     this.ctx.setLineWidth(10);
     this.ctx.stroke();
     this.ctx.draw();
-    console.log(distance1);
+    // console.log(distance1);
+
+  },
+  drawcanvas() {
+    var borderRadius = 30;
+    var points = [{
+      x: 100,
+      y: 50
+    }, {
+      x: 200,
+      y: 50
+    }, {
+      x: 200,
+      y: 200
+    }, {
+      x: 100,
+      y: 200
+    }];
+    this.ctx.beginPath();
+    var len = points.length;
+    for (var i = 0; i < len; i++) {
+      var {
+        x: x1,
+        y: y1
+      } = points[(i - 1) % len];
+      var {
+        x: x2,
+        y: y2
+      } = points[i];
+      var {
+        x: x3,
+        y: y3
+      } = points[(i + 1) % len];
+
+      //起点坐标
+      var {
+        x: sX,
+        y: sY
+      } = this.getLocation(x1, y1, this.getA(x1, y1, x2, y2), borderRadius);;
+      // this.ctx.lineTo(sX, sY);
+      //计算出第一条线和x轴的夹角
+      var a1 = this.getA(x2, y2, x1, y1)
+      //首先计算出下个点的坐标
+      var {
+        x: nX,
+        y: nY
+      } = this.getLocation(x2, y2, a1, borderRadius);
+      this.ctx.lineTo(nX, nY);
+      //计算出第二条线和x轴的夹角
+      var a2 = this.getA(x2, y2, x3, y3);
+      var {
+        x: aX,
+        y: aY
+      } = this.getLocation(nX, nY, a2, borderRadius);
+
+      //绘制圆弧
+
+      this.ctx.arc(aX, aY, borderRadius, a2 + Math.PI, a1 + Math.PI);
+    }
+    this.ctx.closePath();
+
+
+    this.ctx.setStrokeStyle('black');
+    this.ctx.setLineWidth(10);
+    this.ctx.stroke();
+    this.ctx.draw();
+    // console.log(distance1);
 
   },
   /**
@@ -130,7 +217,7 @@ Page({
       A = 2 * Math.PI + A;
     }
     //* 180 / Math.PI//* 180 / Math.PI
-    return A 
+    return A
   },
   /**
    * 根据两点坐标计算出距离
