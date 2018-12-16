@@ -41,7 +41,7 @@ Page({
           color: 'blue',
           isStroke: true, //是否描边，默认false
           lineColor: 'red', //边框颜色,默认color
-          borderRadius: 0.3, //圆角边框，默认为0
+          borderRadius: 10, //圆角边框，默认为0
           shadow: '30 30 2 black' //阴影
         }]
       }
@@ -61,20 +61,23 @@ Page({
           isFill: true, //是否填充
           isStroke: true, //是否描边
           lineColor: 'red', //边框颜色,不写和color一样
-          shadow: '5 5 10 black', //阴影，因为描边是覆盖在在填充上,所以'1 1 0 black'会被描边覆盖
-          lineJoin: 'round', //设置线条的交点样式，有bevel斜角和round圆角和miter尖角
+          shadow: '20 20 5 black', //阴影，因为描边是覆盖在在填充上,所以'1 1 0 black'会被描边覆盖
+          borderRadius:20, //圆角边框
           points: [{ //points里是4个顶点的坐标
-            x: 10,
+            x: 50,
+            y: 50,
+          }, {
+            x: 100,
             y: 10,
           }, {
             x: 150,
-            y: 10,
+            y: 50,
           }, {
-            x: 150,
-            y: 120,
-          }, {
-            x: 10,
-            y: 190,
+              x: 150,
+            y: 180,
+          },{
+            x:20,
+            y:150
           }]
 
         }]
@@ -97,13 +100,14 @@ Page({
           level: 5, //层级，就是5个圈
           isArc: false, //是否是圆,
           isPolygon: true, //是否是多边形
-          isFill: false, //是否是填充
+          isFill: true, //是否是填充
           isStroke: true, //是否描边，与填充不能共存
           lineWidth: 5, //正多边形边数
           color: 'red', //颜色
           colors: ['green', 'red', 'yellow', 'orange'], //当colors存在时，color无效
           isVertexLine: false, //是否有中心线
           lines: 6,
+          lineColor:'red',
         }]
       }
     })

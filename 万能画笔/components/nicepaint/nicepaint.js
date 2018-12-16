@@ -176,7 +176,7 @@ Component({
       this.ctx.save();
       this.setShadow(shadow);
       if (borderRadius) {
-        this.createBorderRadiusPath(left, top, width, height, borderRadius);
+        this.createBorderRadiusPath(this.getPointsByInfo(left, top, width, height), borderRadius);
         if (shadow) {
           //这一步是为了绘制阴影
           this.ctx.fill();
@@ -279,7 +279,7 @@ Component({
 
       this.ctx.save();
       this.setShadow(shadow);
-      this.createBorderRadiusPath(left, top, width, height, borderRadius);
+      this.createBorderRadiusPath(this.getPointsByInfo(left, top, width, height), borderRadius);
 
       if (isFill) {
         this.ctx.setFillStyle(color);
@@ -409,6 +409,8 @@ Component({
       isStroke = true,
       level = 1, //层级
       lineWidth = 1, //线宽
+      lineColor = 'black',
+      shadow,
       color = 'red',
       colors, //颜色数组,如果此属性存在,color无效,['yellow','red','green']
       lines = 4,
@@ -454,17 +456,21 @@ Component({
             radius: radius - count * interval,
             color,
             lineWidth,
-            isStroke: !isFill
+            isStroke,
+            lineColor,
+            shadow
           });
         }
         //绘制多边形
         if (isPolygon) {
-
           this.drawPolygon({
             isFill,
             points: locations,
             lineWidth,
-            color
+            color,
+            isStroke,
+            lineColor,
+            shadow
           });
         }
         count++;
@@ -547,17 +553,12 @@ Component({
       lineColor, //如果不写默认是color
       points, //坐标数组类似[{x:10,y:10},{x:100,y:10},{x:50,y:100}]
       shadow,
-      lineJoin//设置线条的交点样式,有bevel斜角 round 圆角,miter尖角
+      borderRadius = 0
     }) {
       if (!points) return;
       this.ctx.save();
       this.setShadow(shadow);
-      this.ctx.setLineJoin(lineJoin)
-      this.ctx.beginPath();  
-      for (var i = 0; i < points.length; i++) {
-        this.ctx.lineTo(points[i].x, points[i].y);
-      }
-      this.ctx.closePath();
+      this.createBorderRadiusPath(points, borderRadius);
       if (isFill) {
         this.ctx.setFillStyle(color);
         this.ctx.fill();
@@ -586,17 +587,20 @@ Component({
       isClockwise = false,
       color,
       lineWidth = 2,
-      lineColor
+      lineColor,
+      shadow
     }) {
       // console.log('绘制圆的颜色',color);
       this.ctx.save();
       this.ctx.beginPath();
       this.ctx.arc(x, y, radius, sA, eA, isClockwise);
       this.ctx.closePath();
+      this.setShadow(shadow);
       if (isFill) {
         this.ctx.setFillStyle(color);
         this.ctx.setFillStyle(color);
         this.ctx.fill();
+        this.setShadow(null);
       }
       if (isStroke) {
         this.ctx.setLineWidth(lineWidth);
@@ -746,7 +750,65 @@ Component({
 
       this.ctx.closePath();
     },
+    createBorderRadiusPath(points, borderRadius = 0) {
+      this.ctx.beginPath();
+      var len = points.length;
+      if (borderRadius) {
+        for (var i = 0; i < len; i++) {
+          var {
+            x: x1,
+            y: y1
+          } = points[(i - 1 + len) % len];
+          var {
+            x: x2,
+            y: y2
+          } = points[i];
+          var {
+            x: x3,
+            y: y3
+          } = points[(i + 1) % len];
 
+          var a1 = this.getA(x2, y2, x1, y1);
+          var a2 = this.getA(x2, y2, x3, y3);
+          var a3 = (Math.PI - a1 + a2) / 2;
+          var distance = borderRadius * Math.tan(a3);
+          var {
+            x: sX,
+            y: sY
+          } = this.getLocation(x2, y2, a1, distance);
+          this.ctx.lineTo(sX, sY);
+          var {
+            x: eX,
+            y: eY
+          } = this.getLocation(x2, y2, a2, distance);
+
+          this.ctx.arcTo(x2, y2, eX, eY, borderRadius);
+        }
+      } else {
+        for (var i = 0; i < len; i++) {
+          this.ctx.lineTo(points[i].x, points[i].y);
+        }
+      }
+      this.ctx.closePath();
+    },
+    /**
+     * 根据left,top,width,height计算出4个点的坐标
+     */
+    getPointsByInfo(left, top, width, height) {
+      return [{
+        x: left,
+        y: top
+      }, {
+        x: left + width,
+        y: top
+      }, {
+        x: left + width,
+        y: top + height
+      }, {
+        x: left,
+        y: top + height
+      }]
+    },
 
 
     /**
