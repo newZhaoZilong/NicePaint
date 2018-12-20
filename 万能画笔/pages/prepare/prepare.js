@@ -185,13 +185,19 @@ Page({
       x: 100,
       y: 150
     }];
-    this.createBorderRadiusPath(this.getPointsByInfo(10,10,200,300), borderRadius);
+    // this.createBorderRadiusPath(this.getPointsByInfo(10,10,200,300), borderRadius);
 
 
-    this.ctx.setStrokeStyle('black');
-    this.ctx.setLineWidth(10);
-    this.ctx.stroke();
-    this.ctx.draw();
+    this.ctx.setLineDash([10, 10])
+
+    this.ctx.beginPath()
+    this.ctx.moveTo(30, 100)
+    this.ctx.lineTo(200, 100)
+    this.ctx.stroke()
+
+    this.ctx.draw()
+
+
     // console.log(distance1);
 
   },

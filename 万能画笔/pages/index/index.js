@@ -116,17 +116,17 @@ Page({
           x: 100, //中心点横坐标
           y: 100, //中心点纵坐标
           radius: 80, //半径
-          level: 1, //层级，就是5个圈
+          level: 5, //层级，就是5个圈
           isArc: false, //是否是圆,
           isPolygon: true, //是否是多边形
-          isFill: true, //是否是填充
-          isStroke: false, //是否描边，与填充不能共存
-          lineWidth: 3, //线宽
+          isFill: false, //是否是填充
+          isStroke: true, //是否描边，与填充不能共存
+          lineWidth: 5, //线宽
           color: 'red', //颜色
           colors: ['green', 'red', 'yellow', 'orange'], //当colors存在时，color无效
           isVertexLine: false, //是否有中心线
           lines: 6,
-          shadow: '20 20 5 black',
+          shadow: '3 3 2 gray',
           borderRadius:10,
           // lineColor: 'red',
         }]
@@ -213,9 +213,10 @@ Page({
           },
           polygon: { //net的属性跟drawPolygon里传入的参数一样，不需要传入points
             isFill:true,
-            isStroke: true, //是否有边框
-            lineColor: 'white', //边框颜色
-            lineWidth: 1 //边框宽度
+            isStroke: true, //是否有边框   
+            lineColor:'white',
+            lineWidth:1,   
+            shadow:'2 2 2 gray',
           },
           vertex: { //vertex的属性跟drawArc里传入的参数一样,中心点坐标不需要传
             radius: 3, //半径
@@ -241,6 +242,8 @@ Page({
           top: 0, //左上角纵坐标
           width: 500,
           height: 500,
+          isFill:true,
+          isStroke:false,
           color: 'pink',
         }, {
           type: 'image', //绘制图片

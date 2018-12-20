@@ -504,6 +504,7 @@ Component({
       shadow,
       borderRadius = 0,
       lineJoin = 'round',
+      lineDash
     }) {
       if (!points) return;
       this.ctx.save();
@@ -518,12 +519,14 @@ Component({
         this.ctx.setLineJoin(lineJoin);
         this.ctx.setLineWidth(lineWidth);
         this.ctx.setStrokeStyle(lineColor || color);
+        if (lineDash) {
+          this.ctx.setLineDash(lineDash, 0)
+        }
         this.ctx.stroke();
       }
       this.ctx.restore();
       console.log('绘制多边形成功');
     },
-
     /**
      * 绘制圆弧
      */
@@ -539,7 +542,8 @@ Component({
       color,
       lineWidth = 2,
       lineColor,
-      shadow
+      shadow,
+      lineDash
     }) {
       // console.log('绘制圆的颜色',color);
       this.ctx.save();
@@ -556,12 +560,16 @@ Component({
       if (isStroke) {
         this.ctx.setLineWidth(lineWidth);
         this.ctx.setStrokeStyle(lineColor || color);
+        if (lineDash) {
+          this.ctx.setLineDash(lineDash, 0)
+        }
         this.ctx.stroke();
       }
 
       this.ctx.restore();
       console.log('绘制圆弧成功');
     },
+
     /**
      * 根据一个中心点，半径,多边形边数，
      * 计算出多边形顶点坐标和相对于中心点弧度并
