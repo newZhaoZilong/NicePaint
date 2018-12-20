@@ -13,6 +13,15 @@ Page({
    */
   onLoad: function(options) {
     this.ctx = wx.createCanvasContext("mycanvas", this);
+    wx.showToast({
+      title: 'nihao',
+      success(){
+        console.log('haha');
+      },
+      complete(){
+        console.log('heh');
+      }
+    })
   },
   /**
    * 绘制canvas

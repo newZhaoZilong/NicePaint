@@ -42,8 +42,8 @@ Component({
       'image': this.drawImage, //绘制图片
       'text': this.drawText, //绘制文本
       'rect': this.drawRect, //绘制长方形
-      'arc': this.drawArc, //绘制圆弧
-      'polygon': this.drawPolygon, //绘制多边形
+      'arc': this.drawArc, //绘制圆弧,基本方法
+      'polygon': this.drawPolygon, //绘制多边形，基本方法（核心）
       'centerpolygon': this.drawCenterPolygon, //绘制中心多边形
       'net': this.drawNet, //绘制网格   
       'abilitychart': this.drawAbilityChart //绘制能力表
@@ -258,7 +258,6 @@ Component({
         }
       }
       this.ctx.restore();
-
     },
     /**
      * 绘制rect,可能是描边，也可能是填充
@@ -268,33 +267,13 @@ Component({
       top = 0,
       width = 100,
       height = 100,
-      isFill = true, //是否填充    
-      color = 'red',
-      isStroke = false, //是否描边,都为true的时候相当于添加了一个边框
-      lineWidth = 10,
-      lineColor,
-      borderRadius = 0, //圆角边框，只接受小数,类似0.5会被切成一个圆
-      shadow
+      ...commonStyle
     }) {
-
-      this.ctx.save();
-      this.setShadow(shadow);
-      this.createBorderRadiusPath(this.getPointsByInfo(left, top, width, height), borderRadius);
-
-      if (isFill) {
-        this.ctx.setFillStyle(color);
-        this.ctx.fill();
-        this.setShadow(null);
-      }
-      if (isStroke) {
-        this.ctx.setLineWidth(lineWidth);
-        this.ctx.setStrokeStyle(lineColor || color);
-        this.ctx.stroke();
-      }
-
-      this.ctx.restore();
+      this.drawPolygon({
+        points: this.getPointsByInfo(left, top, width, height),
+        ...commonStyle
+      });
       console.log('绘制矩形成功');
-
     },
     /**
      * 绘制能力表,需要传入中心点坐标,
@@ -305,17 +284,16 @@ Component({
     drawAbilityChart({
       x, //中心点x坐标
       y, //中心点y坐标
-      isNet, //是否有网格
-      isTransparent, //是否是透明的，其实就是网格在上，看起来像透明的,false不透明是网格在下
-      isCenter = true, //是否需要中心点，为false的话，就直接画个多边形
       radius = 100, //半径
+      isCenter = true, //是否需要中心点，为false的话，就直接画个多边形
       scores, //能力值数组,必须写颜色,和能力值
-      net = {}, //网格配置
+      vertexColors = [], //顶点的颜色数组
+      net, //网格配置是一个对象
       polygon = {}, //中心多边形配置
-      vertex = {} //顶点配置
+      vertex = {}, //顶点配置
+      // border,//边框配置
     }) {
       this.ctx.save();
-
       //对于多边形层框，分为三步，再画中心多边形,先画层框，最后画点
       var points = this.getRegularPolygonLocations({
         x,
@@ -327,69 +305,37 @@ Component({
         v.color = scores[i].color
       })
       console.log(points);
-      //封装画网格的参数对象
-      // net.x = x, net.y = y, net.radius = radius, net.lines = scores.length;
-      //封装画中心多边形的参数对象
-      // polygon.x = x, polygon.y = y, polygon.points = points;
-      //封装画顶点的参数对象
-
-      if (isTransparent) {
-        if (isCenter) {
-          this.drawCenterPolygon({
-            x,
-            y,
-            points,
-            ...polygon
-          });
-        } else {
-          this.drawPolygon({
-            points,
-            ...polygon
-          })
-        }
-
-        if (isNet) {
-          this.drawNet({
-            x,
-            y,
-            radius,
-            lines: scores.length,
-            ...net
-          });
-        }
-
-      } else {
-        if (isNet) {
-          this.drawNet({
-            x,
-            y,
-            radius,
-            lines: scores.length,
-            ...net
-          });
-        }
-        if (isCenter) {
-          this.drawCenterPolygon({
-            x,
-            y,
-            points,
-            ...polygon
-          });
-        } else {
-          this.drawPolygon({
-            points,
-            ...polygon
-          })
-        }
+      //是否使用网格
+      if (net) {
+        this.drawNet({
+          x,
+          y,
+          radius,
+          lines: scores.length,
+          ...net,
+        });
       }
-
+      //是否绘制中心多边形，不绘制的话，就直接绘制一个多边形
+      if (isCenter) {
+        this.drawCenterPolygon({
+          x,
+          y,
+          points,
+          ...polygon
+        });
+      } else {
+        this.drawPolygon({
+          points,
+          ...polygon
+        })
+      }
 
       points.forEach((v, i) => {
         this.drawArc({
+          ...vertex,
           x: v.x,
           y: v.y,
-          color: scores[i].color,
-          ...vertex
+          color: vertexColors[i] || scores[i].color,
         })
       })
       this.ctx.restore();
@@ -400,26 +346,30 @@ Component({
      * 同心圆和同心正多边形可一块绘制,
      * 绘制方法是首先循环层级，从最外层开始
      * 依次获取每个层级的坐标然后绘制，由最外层绘制到最内层
+     *       isFill = true, //是否填充
+     *    isStroke = false, //是否描边
+     * color = 'red', //填充颜色
+     * lineWidth = 10, //边框宽度
+     * lineColor, //如果不写默认是color
+     *  shadow,
+     * borderRadius = 0
+     *这7个属性为常用属性,一般会放入commonStyle对象中
      */
     drawNet({
       x,
       y,
       radius = 100,
-      isFill = false,
-      isStroke = true,
-      level = 1, //层级
-      lineWidth = 1, //线宽
-      lineColor = 'black',
-      shadow,
-      color = 'red',
+      level = 2, //层级
       colors, //颜色数组,如果此属性存在,color无效,['yellow','red','green']
-      lines = 4,
       isArc = false, //是否绘制圆
       isPolygon = true, //是否绘制正多边形
-      isVertexLine = true //是否绘制中心点到顶点的连线
+      isVertexLine = true, //是否绘制中心点到顶点的连线
+      lines = 4,
+      ...commonStyle
     }) {
 
       this.ctx.save();
+      var color = commonStyle.color;
       var interval = radius / level;
       var count = 0;
 
@@ -433,45 +383,42 @@ Component({
             x,
             y,
             radius: radius - count * interval,
-            lines
+            lines,
+            isClockwise: true
           });
         }
 
         //画顶点到中心的连线
-        if (!isFill && isVertexLine && count == 0) {
+        if (!commonStyle.isFill && isVertexLine && count == 0) {
           locations.forEach((v) => {
             this.ctx.moveTo(x, y);
             this.ctx.lineTo(v.x, v.y);
           })
-          this.ctx.setLineWidth(lineWidth);
+          this.ctx.setLineWidth(commonStyle.lineWidth);
           this.ctx.setStrokeStyle(color);
           this.ctx.stroke();
         }
+        console.log('locations', JSON.stringify(locations));
 
         if (isArc) { //绘制圆
           this.drawArc({
-            isFill,
+            ...commonStyle,
             x,
             y,
             radius: radius - count * interval,
-            color,
-            lineWidth,
-            isStroke,
-            lineColor,
-            shadow
           });
         }
         //绘制多边形
         if (isPolygon) {
           this.drawPolygon({
-            isFill,
-            points: locations,
-            lineWidth,
+            ...commonStyle,
             color,
-            isStroke,
-            lineColor,
-            shadow
+            points: locations,
           });
+          if (commonStyle.shadow && commonStyle.isFill && count == 0) {
+            //如果是fill的话，只绘制一个圆的阴影
+            commonStyle.shadow = null;
+          }
         }
         count++;
       }
@@ -500,60 +447,63 @@ Component({
     drawCenterPolygon({
       x, //中心点x坐标 必填
       y, //中心点y坐标 必填
-      isFill = true, //填充
-      isStroke = true, //描边
-      lineWidth = 10,
-      lineColor = 'white', //边框颜色
-      color,
       points, //顶点的坐标数组，[{x:10,y:10,color:'red'},{x:100,y:10,color:'green'},{x:50,y:200,color:'blue'}]
+      shadow,
+      border,
+      ...commonStyle
     }) {
-
+      console.log('commonStyle', commonStyle);
       if (!points) {
         console.log('绘制中心多边形points是必须的!', points);
         return;
       };
-      this.ctx.save();
-      if (isStroke) {
-        //设置线条的结束交点样式
-        this.ctx.setLineJoin('round');
-        this.ctx.setLineWidth(lineWidth);
-        this.ctx.setStrokeStyle(lineColor);
+      if (shadow) {
+        this.drawPolygon({
+          isFill: true,
+          isStroke: false,
+          shadow,
+          points: points
+        });
       }
       //循环绘制每个三角区域
       for (var i = 0; i < points.length; i++) {
-        this.ctx.beginPath();
-        this.ctx.lineTo(points[i].x, points[i].y);
         var nextIndex = (i + 1) % points.length;
-        this.ctx.lineTo(points[nextIndex].x, points[nextIndex].y);
-        this.ctx.lineTo(x, y);
-        this.ctx.closePath();
-
-        if (isFill) {
-          this.ctx.setFillStyle(color || points[i].color);
-          this.ctx.setFillStyle(color || points[i].color);
-          // console.log('当前三角形颜色', color || points[i].color);
-          this.ctx.fill();
-        }
-        if (isStroke) {
-          this.ctx.stroke();
-        }
+        this.drawPolygon({
+          ...commonStyle,
+          color: points[i].color,
+          points: [points[i], points[nextIndex], {
+            x,
+            y
+          }]
+        });
       }
 
-      this.ctx.restore();
+      //是否在外围添加一个统一的边框
+      if (border) {
+        this.drawPolygon({
+          ...border,
+          isFill: false,
+          isStroke: true,
+          points
+        })
+      }
+
+
       console.log('绘制中心多边形成功');
     },
     /**
      * 绘制多边形
      */
     drawPolygon({
-      isFill = true, //是否填充
-      color = 'red', //填充颜色
-      isStroke = false, //是否描边
+      points, //坐标数组类似[{x:10,y:10},{x:100,y:10},{x:50,y:100}]
+      isFill = false, //是否填充
+      isStroke = true, //是否描边
+      color = 'red', //填充颜色   
       lineWidth = 10, //边框宽度
       lineColor, //如果不写默认是color
-      points, //坐标数组类似[{x:10,y:10},{x:100,y:10},{x:50,y:100}]
       shadow,
-      borderRadius = 0
+      borderRadius = 0,
+      lineJoin = 'round',
     }) {
       if (!points) return;
       this.ctx.save();
@@ -565,6 +515,7 @@ Component({
         this.setShadow(null);
       }
       if (isStroke) {
+        this.ctx.setLineJoin(lineJoin);
         this.ctx.setLineWidth(lineWidth);
         this.ctx.setStrokeStyle(lineColor || color);
         this.ctx.stroke();
@@ -680,25 +631,7 @@ Component({
     getDistance(sX, sY, eX, eY) {
       return Math.sqrt(Math.pow(eY - sY, 2) + Math.pow(eX - sX, 2));
     },
-    /**
-     * 对边框进行裁剪的小方法，可以将方形，图片裁剪出borderRadius
-     * clip=true是用于切角，
-     * clip=false是用于绘制阴影
-     */
-    clipBorder(left, top, width, height, borderRadius, shadow) {
 
-
-      this.createBorderRadiusPath(left, top, width, height, borderRadius);
-
-      if (shadow) {
-        var shadow_list = shadow.split(' ');
-        //shadow4个属性必须全部填写
-        this.ctx.setShadow(...shadow_list);
-        //如果不用fill的话，阴影会变成一个圈，如果设置透明色的话，阴影也会变透明
-        this.ctx.fill();
-      }
-      this.ctx.clip();
-    },
     /**
      * 设置阴影
      */
@@ -714,42 +647,38 @@ Component({
         this.ctx.setShadow(0, 0, 0, 'black');
       }
     },
-    /**
-     * 内部用的绘制圆角，borderRadius的值为0.5时，是圆形
-     */
-    createBorderRadiusPath(left, top, width, height, borderRadius) {
-      // if (borderRadius > 0.5) {
-      //   console.log('borderRadius的值不能大于0.5');
-      //   return;
-      // }
+    // /**
+    //  * 内部用的绘制圆角，borderRadius的值为0.5时，是圆形
+    //  */
+    // createBorderRadiusPath(left, top, width, height, borderRadius) {
 
-      var radius = height * borderRadius;
-      this.ctx.beginPath();
-      //画右下角
-      this.ctx.lineTo(left + width, top + height - radius);
-      if (borderRadius) {
-        this.ctx.arc(left + width - radius, top + height - radius, radius, 0, 0.5 * Math.PI);
-      }
+    //   var radius = height * borderRadius;
+    //   this.ctx.beginPath();
+    //   //画右下角
+    //   this.ctx.lineTo(left + width, top + height - radius);
+    //   if (borderRadius) {
+    //     this.ctx.arc(left + width - radius, top + height - radius, radius, 0, 0.5 * Math.PI);
+    //   }
 
-      //画左下角
-      this.ctx.lineTo(left + radius, top + height);
-      if (borderRadius) {
-        this.ctx.arc(left + radius, top + height - radius, radius, 0.5 * Math.PI, Math.PI);
-      }
+    //   //画左下角
+    //   this.ctx.lineTo(left + radius, top + height);
+    //   if (borderRadius) {
+    //     this.ctx.arc(left + radius, top + height - radius, radius, 0.5 * Math.PI, Math.PI);
+    //   }
 
-      //画左上角
-      this.ctx.lineTo(left, top + radius);
-      if (borderRadius) {
-        this.ctx.arc(left + radius, top + radius, radius, Math.PI, 1.5 * Math.PI);
-      }
-      //画右上角
-      this.ctx.lineTo(left + width - radius, top);
-      if (borderRadius) {
-        this.ctx.arc(left + width - radius, top + radius, radius, 1.5 * Math.PI, 0);
-      }
+    //   //画左上角
+    //   this.ctx.lineTo(left, top + radius);
+    //   if (borderRadius) {
+    //     this.ctx.arc(left + radius, top + radius, radius, Math.PI, 1.5 * Math.PI);
+    //   }
+    //   //画右上角
+    //   this.ctx.lineTo(left + width - radius, top);
+    //   if (borderRadius) {
+    //     this.ctx.arc(left + width - radius, top + radius, radius, 1.5 * Math.PI, 0);
+    //   }
 
-      this.ctx.closePath();
-    },
+    //   this.ctx.closePath();
+    // },
     createBorderRadiusPath(points, borderRadius = 0) {
       this.ctx.beginPath();
       var len = points.length;
