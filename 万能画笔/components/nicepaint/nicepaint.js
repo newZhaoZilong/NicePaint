@@ -293,7 +293,7 @@ Component({
       vertex = {}, //顶点配置
       // border,//边框配置
     }) {
-      this.ctx.save();
+      // this.ctx.save();
       //对于多边形层框，分为三步，再画中心多边形,先画层框，最后画点
       var points = this.getRegularPolygonLocations({
         x,
@@ -338,7 +338,7 @@ Component({
           color: vertexColors[i] || scores[i].color,
         })
       })
-      this.ctx.restore();
+      // this.ctx.restore();
     },
 
     /**
@@ -398,7 +398,7 @@ Component({
           this.ctx.setStrokeStyle(color);
           this.ctx.stroke();
         }
-        console.log('locations', JSON.stringify(locations));
+        // console.log('locations', JSON.stringify(locations));
 
         if (isArc) { //绘制圆
           this.drawArc({
@@ -768,6 +768,7 @@ Component({
               complete: res => {
                 if (res.errMsg === 'getImageInfo:ok') {
                   this.data.cache[url] = res.path;
+                  console.log('下载图片成功', url);
                   resolve(res.path);
                 } else {
                   reject('下载图片到本地失败');
