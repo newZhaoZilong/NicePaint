@@ -14,7 +14,31 @@ Page({
 
 
   },
+onShareAppMessage(){
+  return {
+    title: this.shareDesc,
+    path: this.route,
+    imageUrl: this.activityImg,
+    success: (res) => {
+      console.log(res);
+      // 小米 8 有时能走进来 有时候不能
+    }
 
+  }
+
+},
+  onPush: function() {
+    let obj = {
+      top: '(4)',
+      center: 'D',
+      deep: '测试'
+    }
+    this.data.items.push(obj)
+    this.setData({
+      items: this.data.items
+    })
+    console.log('items', this.data.items)
+  },
 
 
   /**
@@ -32,11 +56,11 @@ Page({
           width: 150,
           height: 100,
           color: 'blue',
-          isFill:true,
+          isFill: true,
           isStroke: true, //是否描边，默认false
           lineColor: 'red', //边框颜色,默认color
           borderRadius: 10, //圆角边框，默认为0,单位是px
-            shadow: '20 20 2 black' //阴影
+          shadow: '20 20 2 black' //阴影
         }]
       }
     })
@@ -45,20 +69,20 @@ Page({
   /**
    * 绘制圆形
    */
-  drawArc(){
+  drawArc() {
     this.setData({
       painting: {
         width: 200, //画布宽，也是导出图片的尺寸
         height: 200, //画布高
-        views: [ {
+        views: [{
           type: 'arc', //绘制网格
-          x:100,
-          y:100,
-          radius:80,
+          x: 100,
+          y: 100,
+          radius: 80,
           color: 'blue',
           isFill: true,
           isStroke: true, //是否描边，默认false
-          lineWidth:10,
+          lineWidth: 10,
           lineColor: 'red', //边框颜色,默认color
           borderRadius: 10, //圆角边框，默认为0
           shadow: '10 10 2 black' //阴影
@@ -82,8 +106,7 @@ Page({
           lineColor: 'red', //边框颜色,不写和color一样
           shadow: '20 20 5 black', //阴影，因为描边是覆盖在在填充上,所以'1 1 0 black'会被描边覆盖
           borderRadius: 5, //圆角边框
-          points: 
-          [{ //points里是4个顶点的坐标
+          points: [{ //points里是4个顶点的坐标
             x: 50,
             y: 50,
           }, {
@@ -127,7 +150,7 @@ Page({
           isVertexLine: false, //是否有中心线
           lines: 6,
           shadow: '3 3 2 gray',
-          borderRadius:10,
+          borderRadius: 10,
           // lineColor: 'red',
         }]
       }
@@ -147,11 +170,11 @@ Page({
           y: 110, //中心点纵坐标
           // lineColor: 'green', //边框的颜色
           // lineWidth: 3, //边框的宽度
-          isStroke:false,
-          isFill:true,
-          border:{
-            color:'orange',
-            lineWidth:5,
+          isStroke: false,
+          isFill: true,
+          border: {
+            color: 'orange',
+            lineWidth: 5,
           },
           shadow: '10 10 5 black',
           points: [{ //points里是4个顶点的坐标
@@ -199,24 +222,24 @@ Page({
           y: 100, //中心点纵坐标
           radius: 92, //半径，主要用于网格
           scores: scores, //能力数组,有一个score属性,和color属性,color代表区域颜色
-          
+
           isNet: true,
           net: { //net的属性跟drawNet里传入的参数一样
             color: 'red',
             isArc: true, //网格是圆
-            isFill:false,
-            isStroke:true,
+            isFill: false,
+            isStroke: true,
             isPolygon: false, //网格是正多边形
             lineWidth: 2, //网格的线宽
             level: 6, //网格层级
             isVertexLine: false //是否有中线
           },
           polygon: { //net的属性跟drawPolygon里传入的参数一样，不需要传入points
-            isFill:true,
+            isFill: true,
             isStroke: true, //是否有边框   
-            lineColor:'white',
-            lineWidth:1,   
-            shadow:'2 2 2 gray',
+            lineColor: 'white',
+            lineWidth: 1,
+            shadow: '2 2 2 gray',
           },
           vertex: { //vertex的属性跟drawArc里传入的参数一样,中心点坐标不需要传
             radius: 3, //半径
@@ -242,8 +265,8 @@ Page({
           top: 0, //左上角纵坐标
           width: 500,
           height: 500,
-          isFill:true,
-          isStroke:false,
+          isFill: true,
+          isStroke: false,
           color: 'pink',
         }, {
           type: 'image', //绘制图片

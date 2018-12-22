@@ -1,4 +1,5 @@
 <!--index.wxml-->
+
 <button type="primary" bindtap="drawRect">绘制矩形</button>
 <button type="primary" bindtap="drawArc">绘制圆</button>
 <button type="primary" bindtap="drawPolygon">绘制多边形</button>

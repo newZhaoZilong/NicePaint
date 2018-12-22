@@ -384,7 +384,6 @@ Component({
             y,
             radius: radius - count * interval,
             lines,
-            isClockwise: true
           });
         }
 
@@ -690,6 +689,7 @@ Component({
     createBorderRadiusPath(points, borderRadius = 0) {
       this.ctx.beginPath();
       var len = points.length;
+      console.log('points', points);
       if (borderRadius) {
         for (var i = 0; i < len; i++) {
           var {
@@ -707,8 +707,8 @@ Component({
 
           var a1 = this.getA(x2, y2, x1, y1);
           var a2 = this.getA(x2, y2, x3, y3);
-          var a3 = (Math.PI - a1 + a2) / 2;
-          var distance = borderRadius * Math.tan(a3);
+          var a3 = (Math.PI-(a1-a2)) / 2;
+          var distance = borderRadius * Math.abs(Math.tan(a3));
           var {
             x: sX,
             y: sY
