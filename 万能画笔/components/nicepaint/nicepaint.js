@@ -689,7 +689,7 @@ Component({
     createBorderRadiusPath(points, borderRadius = 0) {
       this.ctx.beginPath();
       var len = points.length;
-      console.log('points', points);
+      // console.log('points', points);
       if (borderRadius) {
         for (var i = 0; i < len; i++) {
           var {
