@@ -87,14 +87,14 @@ left,right,width,height,borderRadius,lineWidth的单位都是px
 | -------- |  ---------- | ---------- | ---------- |---------- |-------------------- |
 | left | number |px|0|否|矩形左上角的x坐标 |
 | right | number |px|0|否|矩形左上角的y坐标 |
-| width | number |px|0|否|矩形的宽度 |
-| height | number |px|0|否|矩形的高度 |
+| width | number |px|0|是|矩形的宽度 |
+| height | number |px|0|是|矩形的高度 |
 | isFill | boolean | |true|否| 是否填充 |
 | isStroke | boolean | |false|否| 是否描边 |
 | color | string | |'red'|否|填充颜色 |
 | lineWidth | number |px||否| 设置线条的宽度 |
 | lineColor | string |px||否| 设置描边颜色 |
 | lineJoin | string ||'round'|否|设置线条的交点样式 |
-| lineDash | Array |px|0|否|矩形左上角的x坐标 |
-| borderRadius | number |px|0|否|设置虚线样式，需要传递一个数组,类似[10,20] |
+| lineDash | Array<number> | |0|否|设置虚线样式，需要传递一个数组,类似[10,20] |
+| borderRadius | number |px|0|否| 设置圆角边框 |
 | shadow | string |||否|设定阴影样式,需要传递一个字符串,类似'2 2 1 gray',必须是这种模式 |
