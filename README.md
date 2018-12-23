@@ -81,8 +81,19 @@ painting的views属性需要传递一个数组,数组里添加了两个绘制对
 
 ![](http://pj9rcpedq.bkt.clouddn.com/nicepaint0.PNG)
 
+left,right,width,height,borderRadius,lineWidth的单位都是px
 
-
-|属性名称|默认值| 说明 |
-| -------- | -------------------- | ---------- |
-| mode | 图片裁剪、缩放的模式 | aspectFill |
+|属性名称|类型|单位|默认值|必填| 说明 | 
+| -------- |  ---------- | ---------- | ---------- |-------------------- |
+| left | number |px|0|否|矩形左上角的x坐标 |
+| right | number |px|0|否|矩形左上角的x坐标 |
+| width | number |px|0|否|矩形左上角的x坐标 |
+| height | number |px|0|否|矩形左上角的x坐标 |
+| isFill | number |px|0|否|矩形左上角的x坐标 |
+| isStroke | number |px|0|否|矩形左上角的x坐标 |
+| lineWidth | number |px|0|否|矩形左上角的x坐标 |
+| lineColor | number |px|0|否|矩形左上角的x坐标 |
+| borderRadius | number |px|0|否|矩形左上角的x坐标 |
+| lineJoin | number |px|0|否|矩形左上角的x坐标 |
+| lineDash | number |px|0|否|矩形左上角的x坐标 |
+| shadow | number |px|0|否|矩形左上角的x坐标 |
