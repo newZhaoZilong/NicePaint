@@ -42,6 +42,7 @@ Component({
       'image': this.drawImage, //绘制图片
       'text': this.drawText, //绘制文本
       'rect': this.drawRect, //绘制长方形
+      'line': this.drawLine,
       'arc': this.drawArc, //绘制圆弧,基本方法
       'polygon': this.drawPolygon, //绘制多边形，基本方法（核心）
       'centerpolygon': this.drawCenterPolygon, //绘制中心多边形
@@ -213,6 +214,7 @@ Component({
       textAlign = 'left', //文字对齐方式
       textBaseline = 'top', //文字相对于基线位置
       fontWeight = 'normal', //文本的粗细,只有normal和bold可用
+      textDecoration,//none underline	overline lineThrough
       shadow //阴影,是个字符串类似'2 2 1 gray'
     }) {
       if (!lineHeight) {
@@ -248,6 +250,7 @@ Component({
             var realText = fillText.slice(0, -1);
             var realTop = top + (lineNumber - 1) * lineHeight;
             this.ctx.fillText(realText, left, realTop);
+            // this.ctx.drawLine();
             fillText = fillText.slice(-1);
             lineNumber++;
           }
@@ -304,7 +307,7 @@ Component({
       points.forEach((v, i) => {
         v.color = scores[i].color
       })
-      console.log(points);
+      // console.log(points);
       //是否使用网格
       if (net) {
         this.drawNet({
@@ -389,12 +392,13 @@ Component({
 
         //画顶点到中心的连线
         if (!commonStyle.isFill && isVertexLine && count == 0) {
+          this.ctx.beginPath();
           locations.forEach((v) => {
             this.ctx.moveTo(x, y);
             this.ctx.lineTo(v.x, v.y);
           })
           this.ctx.setLineWidth(commonStyle.lineWidth);
-          this.ctx.setStrokeStyle(color);
+          this.ctx.setStrokeStyle(commonStyle.lineColor || color);
           this.ctx.stroke();
         }
         // console.log('locations', JSON.stringify(locations));
@@ -451,7 +455,6 @@ Component({
       border,
       ...commonStyle
     }) {
-      console.log('commonStyle', commonStyle);
       if (!points) {
         console.log('绘制中心多边形points是必须的!', points);
         return;
@@ -495,8 +498,8 @@ Component({
      */
     drawPolygon({
       points, //坐标数组类似[{x:10,y:10},{x:100,y:10},{x:50,y:100}]
-      isFill = false, //是否填充
-      isStroke = true, //是否描边
+      isFill = true, //是否填充
+      isStroke = false, //是否描边
       color = 'red', //填充颜色   
       lineWidth = 10, //边框宽度
       lineColor, //如果不写默认是color
@@ -525,6 +528,47 @@ Component({
       }
       this.ctx.restore();
       console.log('绘制多边形成功');
+    },
+    /**
+     *绘制线
+     */
+    drawLine({
+      x,
+      y,
+      radius,
+      sA = 0,
+      align = 'left', //left,center,right
+      ...commonStyle
+    }) {
+      var sX, sY, eX, eY;
+      if (align == 'left') {
+        sX = x, sY = y;
+        var eLocation = this.getLocation(x, y, radius, sA);
+        eX = eLocation.x, eY = eLocation.y;
+      } else if (align == 'center') {
+        var sLocation = this.getLocation(x, y, radius / 2, sA + Math.PI);
+        sX = sLocation.x, sY = sLocation.y;
+        var eLocation = this.getLocation(x, y, radius / 2, sA);
+        eX = eLocation.x, eY = eLocation.y;
+      } else if (align == 'right') {
+        var sLocation = this.getLocation(x, y, radius, sA + Math.PI);
+        sX = sLocation.x, sY = sLocation.y;
+        eX = x, eY = y;
+      }
+
+      this.drawPolygon({
+        ...commonStyle,
+        isFill: false,
+        isStroke: true,
+        points: [{
+          x: sX,
+          y: sY
+        }, {
+          x: eX,
+          y: eY
+        }]
+      })
+      console.log('绘制线条成功');
     },
     /**
      * 绘制圆弧
@@ -571,11 +615,6 @@ Component({
 
     /**
      * 根据一个中心点，半径,多边形边数，
-     * 计算出多边形顶点坐标和相对于中心点弧度并
-     * 返回一个对象数组,对象属性有
-     * x,横坐标
-     * y,纵坐标,
-     * A,相对于中心点的弧度
      */
     getRegularPolygonLocations({
       x, //中心点x坐标
@@ -598,7 +637,7 @@ Component({
       while (count < lines) {
         var A = isClockwise ? startA + count * intervalA : startA - count * intervalA //% (Math.PI * 2)
         var point_radius = rates ? radius * rates[count] / 100 : radius;
-        list.push(this.getLocation(x, y, A, point_radius));
+        list.push(this.getLocation(x, y, point_radius, A));
         count++;
       }
       return list;
@@ -606,7 +645,7 @@ Component({
     /**
      * 根据一个坐标,角度,半径,获取另一个角标
      */
-    getLocation(x, y, A, radius) {
+    getLocation(x, y, radius, A) {
       return {
         x: Math.round(x + radius * Math.cos(A)),
         y: Math.round(y + radius * Math.sin(A))
@@ -650,7 +689,7 @@ Component({
         }
         this.ctx.setShadow(...shadow_list);
       } else {
-        console.log('清除阴影');
+        // console.log('清除阴影');
         this.ctx.setShadow(0, 0, 0, 'black');
       }
     },
@@ -689,7 +728,6 @@ Component({
     createBorderRadiusPath(points, borderRadius = 0) {
       this.ctx.beginPath();
       var len = points.length;
-      // console.log('points', points);
       if (borderRadius) {
         for (var i = 0; i < len; i++) {
           var {
@@ -707,17 +745,17 @@ Component({
 
           var a1 = this.getA(x2, y2, x1, y1);
           var a2 = this.getA(x2, y2, x3, y3);
-          var a3 = (Math.PI-(a1-a2)) / 2;
+          var a3 = (Math.PI - (a1 - a2)) / 2;
           var distance = borderRadius * Math.abs(Math.tan(a3));
           var {
             x: sX,
             y: sY
-          } = this.getLocation(x2, y2, a1, distance);
+          } = this.getLocation(x2, y2, distance, a1);
           this.ctx.lineTo(sX, sY);
           var {
             x: eX,
             y: eY
-          } = this.getLocation(x2, y2, a2, distance);
+          } = this.getLocation(x2, y2, distance, a2);
 
           this.ctx.arcTo(x2, y2, eX, eY, borderRadius);
         }

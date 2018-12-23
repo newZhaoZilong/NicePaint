@@ -84,11 +84,11 @@ painting的views属性需要传递一个数组,数组里添加了两个绘制对
 left,right,width,height,borderRadius,lineWidth的单位都是px
 
 |属性名称|类型|单位|默认值|必填| 说明 | 
-| -------- |  ---------- | ---------- | ---------- |---------- |-------------------- |
+| -------- |  ---------- | ------------- | ---------- |------------- |-------------------- |
 | left | number |px|0|否|矩形左上角的x坐标 |
 | right | number |px|0|否|矩形左上角的y坐标 |
-| width | number |px|0|是|矩形的宽度 |
-| height | number |px|0|是|矩形的高度 |
+| width | number |px||是|矩形的宽度 |
+| height | number |px||是|矩形的高度 |
 | isFill | boolean | |true|否| 是否填充 |
 | isStroke | boolean | |false|否| 是否描边 |
 | color | string | |'red'|否|填充颜色 |
