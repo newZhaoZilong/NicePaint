@@ -214,11 +214,18 @@ Component({
       textAlign = 'left', //文字对齐方式
       textBaseline = 'top', //文字相对于基线位置
       fontWeight = 'normal', //文本的粗细,只有normal和bold可用
-      textDecoration,//none underline	overline lineThrough
+      textDecoration = 'none', //none underline	overline lineThrough
       shadow //阴影,是个字符串类似'2 2 1 gray'
     }) {
       if (!lineHeight) {
         lineHeight = fontSize * 1.25;
+      }
+      var decorationHandler = {
+        none: null,
+        underline: fontSize + 1, //定义文本下的一条线
+        overline: -1, //定义文本上的一条线
+        //定义穿过文本的一条线
+        linethrough: fontSize / 2
       }
 
       this.ctx.save();
@@ -250,13 +257,37 @@ Component({
             var realText = fillText.slice(0, -1);
             var realTop = top + (lineNumber - 1) * lineHeight;
             this.ctx.fillText(realText, left, realTop);
-            // this.ctx.drawLine();
+
+            var realTextLength = this.ctx.measureText(fillText.slice(0,-1)).width;
+            if (decorationHandler[textDecoration]) {
+              this.drawLine({
+                x: left,
+                y: realTop + decorationHandler[textDecoration],
+                radius: realTextLength,
+                align: textAlign,
+                color: color,
+                lineWidth: fontSize / 10
+              });
+            }
+
             fillText = fillText.slice(-1);
+
+
             lineNumber++;
           }
           if (i === content.length - 1) {
             var realTop = top + (lineNumber - 1) * lineHeight;
             this.ctx.fillText(fillText, left, realTop);
+            if (decorationHandler[textDecoration]) {
+              this.drawLine({
+                x: left,
+                y: realTop + decorationHandler[textDecoration],
+                radius: textLength,
+                align: textAlign,
+                color: color,
+                lineWidth: fontSize / 10
+              });
+            }
           }
         }
       }
