@@ -870,24 +870,28 @@ Component({
         if (this.data.cache[url]) {
           resolve(this.data.cache[url]);
         } else {
-          const objExp = new RegExp(/^http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/);
-          if (objExp.test(url)) {
+          // const objExp = new RegExp(/^http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/);
+          // if (objExp.test(url)) {
             wx.getImageInfo({
               src: url,
               complete: res => {
                 if (res.errMsg === 'getImageInfo:ok') {
+                  const objExp = new RegExp(/^http(s)?/);
+                  if (!objExp.test(res.path)){
+                    res.path = '/'+res.path;
+                  }
                   this.data.cache[url] = res;//.path
-                  console.log('下载图片成功', url);
+                  console.log('获取图片信息成功', res);
                   resolve(res.path);
                 } else {
                   reject('下载图片到本地失败');
                 }
               }
             })
-          } else {
-            this.data.cache[url] = url;
-            resolve(url);
-          }
+          // } else {
+          //   this.data.cache[url] = url;
+          //   resolve(url);
+          // }
         }
       })
     },
