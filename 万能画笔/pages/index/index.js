@@ -295,7 +295,8 @@ onShareAppMessage(){
           top: 250,
           width: 200,
           height: 200,
-          borderRadius: 100,
+          borderRadius: 20,
+            // mode:'aspectFit'
           // shadow: '30 30 10 gray'
         }, {
           type: 'image',

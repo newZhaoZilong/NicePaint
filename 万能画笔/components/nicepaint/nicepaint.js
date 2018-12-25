@@ -161,18 +161,16 @@ Component({
       url, //图片url地址，可以是本地路径，也可以是网络路径
       left = 0, //图像的左上角在目标 canvas 上 x 轴的位置
       top = 0, //图像的左上角在目标 canvas 上 y 轴的位置
+      mode,
       width, //在目标画布上绘制图像的宽度，允许对绘制的图像进行缩放
       height, //在目标画布上绘制图像的高度，允许对绘制的图像进行缩放
-      sx, //源图像的矩形选择框的左上角 x 坐标
-      sy, //源图像的矩形选择框的左上角 y 坐标
-      sWidth, //源图像的矩形选择框的宽度
-      sHeight, //源图像的矩形选择框的高度
       shadow, //阴影,是个字符串类似'2 2 1 gray'
       borderRadius //圆角边框,只支持不大于0.5的小数，例如0.5,0.4，是相对于高度,0.5会切成圆
     }) {
       //直接从缓存中取路径
-      var path = this.data.cache[url];
+      var imgInfo = this.data.cache[url];
       //如果不保存之前的绘图上下文的画，那么绘制阴影后，会影响到之后绘制的
+      var { path, left, top, width, height, sX, sY, sWidth, sHeight} = this.getImageRealLocationByMode(left, top, width, height, imgInfo, mode);
       //图片
       this.ctx.save();
       this.setShadow(shadow);
@@ -184,14 +182,16 @@ Component({
         }
         this.ctx.clip();
       }
-
-      if (sx) {
-        this.ctx.drawImage(path, sx, sy, sWidth, sHeight, left, top, width, height);
+      // getImageRealLocationByMode
+      if (sWidth) {
+        this.ctx.drawImage(path, sX, sY, sWidth, sHeight, left, top, width, height);
       } else if (width) {
         this.ctx.drawImage(path, left, top, width, height);
       } else {
         this.ctx.drawImage(path, left, top);
       }
+     
+      // this.ctx.drawImage(...this.getImageRealLocationByMode(left, top, width, height, imgInfo,mode));
       //save+restore相当于重置之前的绘图上下文
       //避免设置的属性影响到其他图片
       this.ctx.restore();
@@ -815,6 +815,46 @@ Component({
         y: top + height
       }]
     },
+    /**
+     * 根据mode获取图片实际位置信息,mode不写或者写scaleToFill的话,会拉伸图片
+     * aspectFit保持纵横比缩放图片,使图片的长边能完全显示出来
+     * aspectFill保持纵横比缩放图片,会对图片进行裁剪
+     * widthFix 宽度不变高度自动变化
+     */
+    getImageRealLocationByMode(left, top, width, height, imgInfo, mode){
+
+      var path, sX, sY, sWidth, sHeight;
+      if (typeof (imgInfo) === 'object'){
+        path = imgInfo.path;
+        //图片长宽比
+        var hwratio = height/width;
+        //真实图片长宽比
+        var realratio = imgInfo.height/imgInfo.width;
+
+        if (mode === 'widthFix'){
+          height = width * realratio;
+        } else if (mode === 'aspectFit'){
+          var realWidth = hwratio < realratio ? (height / realratio):width;
+          var realHeight = hwratio < realratio ? height : (width * realratio);
+          left = left + (width-realWidth)/2;
+          top = top + (height-realHeight)/2;
+          width = realWidth;
+          height = realHeight;
+        } else if (mode === 'aspectFill'){
+          sWidth = hwratio < realratio ? imgInfo.width : (imgInfo.height / hwratio);
+          sHeight = hwratio < realratio ? (imgInfo.width * hwratio) : imgInfo.height;
+          sX = 0,
+          sY = 0
+        }
+      }else{
+        path = imgInfo;
+      }
+
+      return { path, sX, sY, sWidth, sHeight,left, top, width, height}
+      
+    },
+
+
 
 
     /**
@@ -836,7 +876,7 @@ Component({
               src: url,
               complete: res => {
                 if (res.errMsg === 'getImageInfo:ok') {
-                  this.data.cache[url] = res.path;
+                  this.data.cache[url] = res;//.path
                   console.log('下载图片成功', url);
                   resolve(res.path);
                 } else {
