@@ -161,7 +161,7 @@ Component({
       url, //图片url地址，可以是本地路径，也可以是网络路径
       left = 0, //图像的左上角在目标 canvas 上 x 轴的位置
       top = 0, //图像的左上角在目标 canvas 上 y 轴的位置
-      mode,
+      mode, //根据mode获取图片实际位置信息,mode不写或者写scaleToFill的话,会拉伸图片，现在可用的mode有aspectFit,aspectFill,widthFix
       width, //在目标画布上绘制图像的宽度，允许对绘制的图像进行缩放
       height, //在目标画布上绘制图像的高度，允许对绘制的图像进行缩放
       shadow, //阴影,是个字符串类似'2 2 1 gray'
@@ -170,7 +170,17 @@ Component({
       //直接从缓存中取路径
       var imgInfo = this.data.cache[url];
       //如果不保存之前的绘图上下文的画，那么绘制阴影后，会影响到之后绘制的
-      var { path, left, top, width, height, sX, sY, sWidth, sHeight} = this.getImageRealLocationByMode(left, top, width, height, imgInfo, mode);
+      var {
+        path,
+        left,
+        top,
+        width,
+        height,
+        sX,
+        sY,
+        sWidth,
+        sHeight
+      } = this.getImageRealLocationByMode(left, top, width, height, imgInfo, mode);
       //图片
       this.ctx.save();
       this.setShadow(shadow);
@@ -190,7 +200,7 @@ Component({
       } else {
         this.ctx.drawImage(path, left, top);
       }
-     
+
       // this.ctx.drawImage(...this.getImageRealLocationByMode(left, top, width, height, imgInfo,mode));
       //save+restore相当于重置之前的绘图上下文
       //避免设置的属性影响到其他图片
@@ -258,7 +268,7 @@ Component({
             var realTop = top + (lineNumber - 1) * lineHeight;
             this.ctx.fillText(realText, left, realTop);
 
-            var realTextLength = this.ctx.measureText(fillText.slice(0,-1)).width;
+            var realTextLength = this.ctx.measureText(fillText.slice(0, -1)).width;
             if (decorationHandler[textDecoration]) {
               this.drawLine({
                 x: left,
@@ -787,8 +797,8 @@ Component({
             x: eX,
             y: eY
           } = this.getLocation(x2, y2, distance, a2);
-
-          this.ctx.arcTo(x2, y2, eX, eY, borderRadius);
+          //Math.round() 这里如果不取整，安卓机就会有问题
+          this.ctx.arcTo(Math.round(x2), Math.round(y2), Math.round(eX), Math.round(eY), Math.round(borderRadius));
         }
       } else {
         for (var i = 0; i < len; i++) {
@@ -821,42 +831,47 @@ Component({
      * aspectFill保持纵横比缩放图片,会对图片进行裁剪
      * widthFix 宽度不变高度自动变化
      */
-    getImageRealLocationByMode(left, top, width, height, imgInfo, mode){
+    getImageRealLocationByMode(left, top, width, height, imgInfo, mode) {
 
       var path, sX, sY, sWidth, sHeight;
-      if (typeof (imgInfo) === 'object'){
+      if (typeof(imgInfo) === 'object') {
         path = imgInfo.path;
         //图片长宽比
-        var hwratio = height/width;
+        var hwratio = height / width;
         //真实图片长宽比
-        var realratio = imgInfo.height/imgInfo.width;
+        var realratio = imgInfo.height / imgInfo.width;
 
-        if (mode === 'widthFix'){
+        if (mode === 'widthFix') {
           height = width * realratio;
-        } else if (mode === 'aspectFit'){
-          var realWidth = hwratio < realratio ? (height / realratio):width;
+        } else if (mode === 'aspectFit') {
+          var realWidth = hwratio < realratio ? (height / realratio) : width;
           var realHeight = hwratio < realratio ? height : (width * realratio);
-          left = left + (width-realWidth)/2;
-          top = top + (height-realHeight)/2;
+          left = left + (width - realWidth) / 2;
+          top = top + (height - realHeight) / 2;
           width = realWidth;
           height = realHeight;
-        } else if (mode === 'aspectFill'){
+        } else if (mode === 'aspectFill') {
           sWidth = hwratio < realratio ? imgInfo.width : (imgInfo.height / hwratio);
           sHeight = hwratio < realratio ? (imgInfo.width * hwratio) : imgInfo.height;
           sX = 0,
           sY = 0
         }
-      }else{
+      } else {
         path = imgInfo;
       }
 
-      return { path, sX, sY, sWidth, sHeight,left, top, width, height}
-      
+      return {
+        path,
+        sX,
+        sY,
+        sWidth,
+        sHeight,
+        left,
+        top,
+        width,
+        height
+      }
     },
-
-
-
-
     /**
      * 获取图片路径，其原理是首先判断缓存里是否有之前的url，
      * 如果没有就判断是本地的还是网络的，如果是网络的就通过getImageInfo获取
@@ -872,22 +887,22 @@ Component({
         } else {
           // const objExp = new RegExp(/^http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/);
           // if (objExp.test(url)) {
-            wx.getImageInfo({
-              src: url,
-              complete: res => {
-                if (res.errMsg === 'getImageInfo:ok') {
-                  const objExp = new RegExp(/^http(s)?/);
-                  if (!objExp.test(res.path)){
-                    res.path = '/'+res.path;
-                  }
-                  this.data.cache[url] = res;//.path
-                  console.log('获取图片信息成功', res);
-                  resolve(res.path);
-                } else {
-                  reject('下载图片到本地失败');
+          wx.getImageInfo({
+            src: url,
+            complete: res => {
+              if (res.errMsg === 'getImageInfo:ok') {
+                const objExp = new RegExp(/^image/);
+                if (objExp.test(res.path)) {
+                  res.path = '/' + res.path;
                 }
+                this.data.cache[url] = res; //.path
+                console.log('获取图片信息成功', res);
+                resolve(res.path);
+              } else {
+                reject('下载图片到本地失败');
               }
-            })
+            }
+          })
           // } else {
           //   this.data.cache[url] = url;
           //   resolve(url);

@@ -14,19 +14,19 @@ Page({
 
 
   },
-onShareAppMessage(){
-  return {
-    title: this.shareDesc,
-    path: this.route,
-    imageUrl: this.activityImg,
-    success: (res) => {
-      console.log(res);
-      // 小米 8 有时能走进来 有时候不能
+  onShareAppMessage() {
+    return {
+      title: this.shareDesc,
+      path: this.route,
+      imageUrl: this.activityImg,
+      success: (res) => {
+        console.log(res);
+        // 小米 8 有时能走进来 有时候不能
+      }
+
     }
 
-  }
-
-},
+  },
   onPush: function() {
     let obj = {
       top: '(4)',
@@ -273,10 +273,10 @@ onShareAppMessage(){
           url: this.data.scancodeUrl, //图片地址
           left: 10, //左上角横坐标
           top: 10, //左上角纵坐标
-          width: 200, //宽
-          height: 200, //高
+          width: 200.25, //宽
+          height: 200.25, //高
           borderRadius: 20, //边框半径
-          shadow: '10 10 10 gray' //加阴影,必须4个都写
+          // shadow: '10 10 10 gray' //加阴影,必须4个都写
         }, {
           type: 'text', //绘制文本
           content: 'nicepaint，一个普通人写的工作用的canvas组件,可以随便更改', //文本内容
@@ -287,7 +287,7 @@ onShareAppMessage(){
           fontSize: 30, //字体尺寸，只有数字
           fontWeight: 'bold', //字体尺寸，只有normal和bold两种，默认normal
           shadow: '1 1 0 white', //加阴影,必须4个都写
-          textDecoration:'linethrough'
+          textDecoration: 'linethrough'
         }, {
           type: 'image',
           url: this.data.imgUrl2,
@@ -296,8 +296,8 @@ onShareAppMessage(){
           width: 200,
           height: 200,
           borderRadius: 20,
-            // mode:'aspectFit'
-          // shadow: '30 30 10 gray'
+          mode: 'aspectFit',
+          shadow: '30 30 10 gray'
         }, {
           type: 'image',
           url: this.data.imgUrl2,
