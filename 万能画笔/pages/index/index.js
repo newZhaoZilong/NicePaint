@@ -288,6 +288,13 @@ Page({
           shadow: '1 1 0 white', //加阴影,必须4个都写
           textDecoration: 'linethrough'
         }, {
+          type:'line',
+          x:250,
+          y:250,
+          width:200,
+          lineWidth:10,
+          lineDash:[18,20]
+        },{
           type: 'image',
           url: this.data.imgUrl2,
           left: 250,

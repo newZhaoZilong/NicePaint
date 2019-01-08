@@ -273,7 +273,7 @@ Component({
               this.drawLine({
                 x: left,
                 y: realTop + decorationHandler[textDecoration],
-                radius: realTextLength,
+                width: realTextLength,
                 align: textAlign,
                 color: color,
                 lineWidth: fontSize / 10
@@ -292,7 +292,7 @@ Component({
               this.drawLine({
                 x: left,
                 y: realTop + decorationHandler[textDecoration],
-                radius: textLength,
+                width: textLength,
                 align: textAlign,
                 color: color,
                 lineWidth: fontSize / 10
@@ -376,10 +376,10 @@ Component({
 
       points.forEach((v, i) => {
         this.drawArc({
-          ...vertex,
           x: v.x,
           y: v.y,
           color: vertexColors[i] || scores[i].color,
+          ...vertex,
         })
       })
       // this.ctx.restore();
@@ -444,7 +444,7 @@ Component({
         }
         // console.log('locations', JSON.stringify(locations));
 
-        if (isArc) { //绘制圆
+        if (!isPolygon || (isArc && isPolygon)) { //绘制圆
           this.drawArc({
             ...commonStyle,
             x,
@@ -453,7 +453,7 @@ Component({
           });
         }
         //绘制多边形
-        if (isPolygon) {
+        if (!isArc || (isArc && isPolygon)) {
           this.drawPolygon({
             ...commonStyle,
             color,
@@ -576,7 +576,7 @@ Component({
     drawLine({
       x,
       y,
-      radius,
+      width,
       sA = 0,
       align = 'left', //left,center,right
       ...commonStyle
@@ -584,15 +584,15 @@ Component({
       var sX, sY, eX, eY;
       if (align == 'left') {
         sX = x, sY = y;
-        var eLocation = this.getLocation(x, y, radius, sA);
+        var eLocation = this.getLocation(x, y, width, sA);
         eX = eLocation.x, eY = eLocation.y;
       } else if (align == 'center') {
-        var sLocation = this.getLocation(x, y, radius / 2, sA + Math.PI);
+        var sLocation = this.getLocation(x, y, width / 2, sA + Math.PI);
         sX = sLocation.x, sY = sLocation.y;
-        var eLocation = this.getLocation(x, y, radius / 2, sA);
+        var eLocation = this.getLocation(x, y, width / 2, sA);
         eX = eLocation.x, eY = eLocation.y;
       } else if (align == 'right') {
-        var sLocation = this.getLocation(x, y, radius, sA + Math.PI);
+        var sLocation = this.getLocation(x, y, width, sA + Math.PI);
         sX = sLocation.x, sY = sLocation.y;
         eX = x, eY = y;
       }
@@ -622,7 +622,7 @@ Component({
       radius = 30,
       sA = 0,
       eA = Math.PI * 2,
-      isClockwise = false,//是否是顺时针
+      isClockwise = true,//是否是顺时针
       color,
       lineWidth = 2,
       lineColor,
@@ -632,7 +632,7 @@ Component({
       // console.log('绘制圆的颜色',color);
       this.ctx.save();
       this.ctx.beginPath();
-      this.ctx.arc(x, y, radius, sA, eA, isClockwise);
+      this.ctx.arc(x, y, radius, sA, eA, !isClockwise);
       this.ctx.closePath();
       this.setShadow(shadow);
       if (!isStroke || (isFill && isStroke)) {
