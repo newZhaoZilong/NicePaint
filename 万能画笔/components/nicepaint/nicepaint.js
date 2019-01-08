@@ -539,8 +539,8 @@ Component({
      */
     drawPolygon({
       points, //坐标数组类似[{x:10,y:10},{x:100,y:10},{x:50,y:100}]
-      isFill = true, //是否填充
-      isStroke = false, //是否描边
+      isFill, //是否填充
+      isStroke, //是否描边
       color = 'red', //填充颜色   
       lineWidth = 10, //边框宽度
       lineColor, //如果不写默认是color
@@ -553,12 +553,12 @@ Component({
       this.ctx.save();
       this.setShadow(shadow);
       this.createBorderRadiusPath(points, borderRadius);
-      if (isFill) {
+      if (!isStroke || (isFill && isStroke)) {
         this.ctx.setFillStyle(color);
         this.ctx.fill();
         this.setShadow(null);
       }
-      if (isStroke) {
+      if (isStroke || (isFill && isStroke)) {
         this.ctx.setLineJoin(lineJoin);
         this.ctx.setLineWidth(lineWidth);
         this.ctx.setStrokeStyle(lineColor || color);
@@ -615,14 +615,14 @@ Component({
      * 绘制圆弧
      */
     drawArc({
-      isFill = true,
-      isStroke = false,
+      isFill,
+      isStroke,
       x = 10,
       y = 10,
       radius = 30,
       sA = 0,
       eA = Math.PI * 2,
-      isClockwise = false,
+      isClockwise = false,//是否是顺时针
       color,
       lineWidth = 2,
       lineColor,
@@ -635,13 +635,13 @@ Component({
       this.ctx.arc(x, y, radius, sA, eA, isClockwise);
       this.ctx.closePath();
       this.setShadow(shadow);
-      if (isFill) {
+      if (!isStroke || (isFill && isStroke)) {
         this.ctx.setFillStyle(color);
         this.ctx.setFillStyle(color);
         this.ctx.fill();
         this.setShadow(null);
       }
-      if (isStroke) {
+      if (isStroke || (isFill && isStroke)) {
         this.ctx.setLineWidth(lineWidth);
         this.ctx.setStrokeStyle(lineColor || color);
         if (lineDash) {
@@ -854,7 +854,7 @@ Component({
           sWidth = hwratio < realratio ? imgInfo.width : (imgInfo.height / hwratio);
           sHeight = hwratio < realratio ? (imgInfo.width * hwratio) : imgInfo.height;
           sX = 0,
-          sY = 0
+            sY = 0
         }
       } else {
         path = imgInfo;

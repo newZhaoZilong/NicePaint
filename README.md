@@ -123,6 +123,7 @@ left,right,width,height,borderRadius,lineWidth的单位都是px
 
 ## 绘制图片drawImage ##
 
+
 ![](http://pj9rcpedq.bkt.clouddn.com/nicepaint2.PNG)
 
 
@@ -140,6 +141,22 @@ left,right,width,height,borderRadius,lineWidth的单位都是px
 
 ## 绘制文字drawText ##
 
+|属性名称|类型|单位|默认值|必填| 说明 | 
+| -------- |  ---------- | ------------- | ---------- |------------- |-------------------- |
+| content | string |||是|文字内容 |
+| left | number | |0|否| 文字位于画布的x坐标 |
+| top | number | |0|否| 文字位于画布的y坐标 |
+| fontSize | number |px|0|否| 文字的尺寸 |
+| color | string | |'black'|否| 文字的颜色 |
+| width | number | |px|是|文字的宽度，用于换行的,如果添加width，文字超出宽度时就会换行,不写width属性不会换行 |
+| lineHeight | number |px|fontSize * 1.25|否| 文字的行高 |
+| textAlign | string ||'left'|否| 文字对齐方式 |
+| textBaseline | string ||'top'|否| 文字的行高 |
+| lineHeight | number |px||否| 文字的行高 |
+| fontWeight | string |||否| 文本的粗细,只有normal和bold可用 |
+| shadow | string |||否|阴影,是个字符串类似'2 2 1 gray' |
+
+## 绘制图片 ##
 |属性名称|类型|单位|默认值|必填| 说明 | 
 | -------- |  ---------- | ------------- | ---------- |------------- |-------------------- |
 | content | string |||是|文字内容 |

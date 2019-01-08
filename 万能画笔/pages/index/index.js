@@ -55,7 +55,7 @@ Page({
           height: 100,
           color: 'blue',
           isFill: true,
-          isStroke: true, //是否描边，默认false
+          isStroke: false, //是否描边，默认false
           lineColor: 'red', //边框颜色,默认color
           borderRadius: 10, //圆角边框，默认为0,单位是px
           shadow: '20 20 2 black' //阴影
@@ -243,7 +243,8 @@ Page({
             radius: 3, //半径
             isStroke: true, //是否有边框
             lineWidth: 1, //边框宽度
-            lineColor: 'white', //边框颜色
+            lineColor:'white',
+            isFill:true
           }
         }]
       }
