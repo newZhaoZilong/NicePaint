@@ -243,8 +243,8 @@ Page({
             radius: 3, //半径
             isStroke: true, //是否有边框
             lineWidth: 1, //边框宽度
-            lineColor:'white',
-            isFill:true
+            lineColor: 'white',
+            isFill: true
           }
         }]
       }
@@ -288,13 +288,13 @@ Page({
           shadow: '1 1 0 white', //加阴影,必须4个都写
           textDecoration: 'linethrough'
         }, {
-          type:'line',
-          x:250,
-          y:250,
-          width:200,
-          lineWidth:10,
-          lineDash:[18,20]
-        },{
+          type: 'line',
+          left: 250,
+          top: 250,
+          width: 200,
+          lineWidth: 10,
+          lineDash: [18, 20]
+        }, {
           type: 'image',
           url: this.data.imgUrl2,
           left: 250,
@@ -312,6 +312,47 @@ Page({
           width: 200,
           height: 200,
           // shadow: '30 30 10 gray'
+        }]
+      }
+    })
+  },
+  /**
+   * 如果每个元素可以添加一个views属性，这样的话views里的元素就是当前元素的子元素，其坐标原点位于父元素的左上角位置
+   */
+  drawCover() {
+    this.setData({
+      painting: {
+        width: 500,
+        height: 500,
+        views: [{
+          type: 'rect', 
+          left: 0, 
+          top: 0, 
+          width: 500,
+          height: 500,
+          color: 'pink',
+          views: [{
+            type: 'arc', 
+            x: 300, //其坐标位置是相对于父元素的,父元素的左上角坐标为(0,0)
+            y: 300, 
+            radius: 200,
+            color: 'yellow',
+            views: [{
+              type: 'rect', 
+              left: 100, //其坐标位置是相对于父元素的,父元素的左上角坐标为(300-200,300-200)也就是(100,100),所以当前元素的实际坐标是(200,200)
+              top: 100, 
+              width: 300,
+              height: 300,
+              color: 'green',
+            }, {
+              type: 'image',
+              url: this.data.imgUrl2,
+              left: 10,
+              top: 10,
+              width: 100,
+              height: 100,
+            }]
+          }]
         }]
       }
     })

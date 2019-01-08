@@ -176,8 +176,8 @@ left,right,width,height,borderRadius,lineWidth的单位都是px,坐标原点是�
 
 |属性名称|类型|单位|默认值|必填| 说明 | 
 | -------- |  ---------- | ------------- | ---------- |------------- |-------------------- |
-| x | number |px |0|是| 起点的x坐标 |
-| y | number |px |0| 是 | 起点的y坐标 |
+| left | number |px |0|是| 起点的x坐标 |
+| top | number |px |0| 是 | 起点的y坐标 |
 | width | number |px ||是|线条长度|
 | color | string | |'black'|否|线条的颜色 |
 | sA | number ||0|否| 绘制线条的角度 |
@@ -268,6 +268,45 @@ left,right,width,height,borderRadius,lineWidth的单位都是px,坐标原点是�
 所以如果想要添加自己的新类型绘制方法，可以编写一个绘制函数，类似drawImage这种，绘制函数接收一个对象参数，
 写完绘制函数后记得在上面的this.data.canvasHandle对象里注册一下，就可以使用了，nicepaint会把views数组里对应类型的对象当作参数传递到对应的类型处理函数里并执行
 
+## 关键提示 ##
+每个元素可以添加一个views属性，这样的话views里的元素就是当前元素的子元素，其坐标原点位于父元素的左上角位置,相当于相对定位的概念,
+
+	   this.setData({
+	      painting: {
+	        width: 500,
+	        height: 500,
+	        views: [{
+	          type: 'rect', 
+	          left: 0, 
+	          top: 0, 
+	          width: 500,
+	          height: 500,
+	          color: 'pink',
+	          views: [{
+	            type: 'arc', 
+	            x: 300, //其坐标位置是相对于父元素的,父元素的左上角坐标为(0,0)
+	            y: 300, 
+	            radius: 200,
+	            color: 'yellow',
+	            views: [{
+	              type: 'rect', 
+	              left: 100, //其坐标位置是相对于父元素的,父元素的左上角坐标为(300-200,300-200)也就是(100,100),所以当前元素的实际坐标是(200,200)
+	              top: 100, 
+	              width: 300,
+	              height: 300,
+	              color: 'green',
+	            }, {
+	              type: 'image',
+	              url: this.data.imgUrl2,
+	              left: 10,
+	              top: 10,
+	              width: 100,
+	              height: 100,
+	            }]
+	          }]
+	        }]
+	      }
+	    })
 ## 组件总结 ##
 
 这个组件就是个 个人项目用于沟通交流的，肯定会有很多瑕疵，有什么问题可以加我微信一起探讨zhaoqingshan1101

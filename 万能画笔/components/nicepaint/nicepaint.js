@@ -36,13 +36,13 @@ Component({
   },
   ready() {
     this.ctx = wx.createCanvasContext('canvasdrawer', this);
-    //注册绘制方法，type类型=>对应处理方法,没新添加一个类型方法都要
+    //注册绘制方法，type类型=>对应处理方法,每新添加一个类型方法都要
     //在这里注册一下，这样写的好处调用方法的时候不需要进行条件判断
     this.data.canvasHandle = {
       'image': this.drawImage, //绘制图片
       'text': this.drawText, //绘制文本
       'rect': this.drawRect, //绘制长方形
-      'line': this.drawLine,
+      'line': this.drawLine, //绘制线段
       'arc': this.drawArc, //绘制圆弧,基本方法
       'polygon': this.drawPolygon, //绘制多边形，基本方法（核心）
       'centerpolygon': this.drawCenterPolygon, //绘制中心多边形
@@ -117,7 +117,7 @@ Component({
       });
     },
     /**
-     * 将图片加载到缓存
+     * 将图片加载到缓存,传入一个字符串数组，或对象数组，如果是对象数组，需要填写key，指明哪儿个属性为url
      */
     downloadAllImageToCache(list, key) {
       var imgPromiselist = [];
@@ -131,6 +131,28 @@ Component({
         if (imgUrl) {
           imgPromiselist.push(this.getImagePath(imgUrl));
         }
+
+        if (list[i].views) {//矫正子元素位置
+          var offsetX;
+          var offsetY;
+          if (list[i].left != undefined) {
+            offsetX = list[i].left;
+            offsetY = list[i].top;
+          } else if (list[i].x != undefined) {
+            offsetX = list[i].x - list[i].radius;
+            offsetY = list[i].y - list[i].radius;
+          }
+          list[i].views.forEach((v) => {
+            if (v.left != undefined) {
+              v.left += offsetX;
+              v.top += offsetY;
+            } else if (v.x != undefined) {
+              v.x += offsetX;
+              v.y += offsetY;
+            }
+            list.push(v);
+          })
+        }
       }
       return Promise.all(imgPromiselist);
     },
@@ -141,6 +163,7 @@ Component({
       for (var i = 0; i < list.length; i++) {
         this.drawElement(list[i]);
       }
+      console.log('最终的list',list);
     },
 
     /**
@@ -271,8 +294,8 @@ Component({
             var realTextLength = this.ctx.measureText(fillText.slice(0, -1)).width;
             if (decorationHandler[textDecoration]) {
               this.drawLine({
-                x: left,
-                y: realTop + decorationHandler[textDecoration],
+                left: left,
+                top: realTop + decorationHandler[textDecoration],
                 width: realTextLength,
                 align: textAlign,
                 color: color,
@@ -290,8 +313,8 @@ Component({
             this.ctx.fillText(fillText, left, realTop);
             if (decorationHandler[textDecoration]) {
               this.drawLine({
-                x: left,
-                y: realTop + decorationHandler[textDecoration],
+                left: left,
+                top: realTop + decorationHandler[textDecoration],
                 width: textLength,
                 align: textAlign,
                 color: color,
@@ -574,25 +597,25 @@ Component({
      *绘制线
      */
     drawLine({
-      x,
-      y,
+      left,
+      top,
       width,
-      sA = 0,
+      sA = 0, //旋转角度
       align = 'left', //left,center,right
       ...commonStyle
     }) {
       var sX, sY, eX, eY;
       if (align == 'left') {
-        sX = x, sY = y;
-        var eLocation = this.getLocation(x, y, width, sA);
+        sX = left, sY = top;
+        var eLocation = this.getLocation(left, top, width, sA);
         eX = eLocation.x, eY = eLocation.y;
       } else if (align == 'center') {
-        var sLocation = this.getLocation(x, y, width / 2, sA + Math.PI);
+        var sLocation = this.getLocation(left, top, width / 2, sA + Math.PI);
         sX = sLocation.x, sY = sLocation.y;
-        var eLocation = this.getLocation(x, y, width / 2, sA);
+        var eLocation = this.getLocation(left, top, width / 2, sA);
         eX = eLocation.x, eY = eLocation.y;
       } else if (align == 'right') {
-        var sLocation = this.getLocation(x, y, width, sA + Math.PI);
+        var sLocation = this.getLocation(left, top, width, sA + Math.PI);
         sX = sLocation.x, sY = sLocation.y;
         eX = x, eY = y;
       }
@@ -622,7 +645,7 @@ Component({
       radius = 30,
       sA = 0,
       eA = Math.PI * 2,
-      isClockwise = true,//是否是顺时针
+      isClockwise = true, //是否是顺时针
       color,
       lineWidth = 2,
       lineColor,
