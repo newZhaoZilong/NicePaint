@@ -1,3 +1,5 @@
+# 绘制展示页 #
+[https://newzhaozilong.github.io/NicePaint/](https://newzhaozilong.github.io/NicePaint/)
 # NicePaint #
 这个工具主要是自己工作的时候用于绘制海报的canvas组件，里面封装了绘制海报的基本方法,使用方法如下:
 
