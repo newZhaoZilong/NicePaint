@@ -16,7 +16,7 @@ nicepaint是一个canvas组件,绘制的时候需要传入一个对象数组，�
 ## 一个简单的nicepaint操作实例 ##
 首先新建一个小程序项目,然后copy一份nicepaint组件到components文件夹里,这时的目录是这样的:
 
-![](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPQAAAGoCAMAAABGyjj0AAABO1BMVEX2+Pjo6enDw8Pz8/MAAADQ0tLT09O9v79jZGTk5ubt7+9VVlZ9fn6en59ERUUtLi5xcnIXqOL09vb2ron8rQCJiora7vX38d7b3d0DAwPExcWZxOI9jssAbL2ztLTX5/GH0O327url5+dAt+apzOWqq6uVlpb38+T43qH7uy4BAQG+5fNUVVVQUVH6xEx6e3sZGRn29fD38+jW2Nj3576Oj49oaWng4uJeXl7Jysqw3/FqxuqKut5MmM8thsj44az1waX43Zx2d3f50HP1gENBQUE9PT31djUqKyv7th71ZBrn7/R7sttcoNP3680efcQOdcH35bn5zGeU1e7I3e0ysuUlreRrqtfBw8P52I750336yVn1bij1bSf8sQ1aWlogICCEhYVvcHD37dQ+j8z51YT7wD78sQxqa2uiTrAmAAAOKUlEQVR42uydCXOTQBTH3yi4QICkNTZxYqxHNUadaDPVGc/aqVc9qtZrvB3P7/8NfI/FUIwaIHGy63t/I7BAO/Prshv4hbCwd+/efXuZRaC5hCd0u93exy1wac+lfcAte/bsEWgWEWguEWguEWguEWguEWguEWgu+Tu0k+QC/Gf5O/TpRZx8OLeYBKaMX3PBjEyoaZqo0wcpDivoNM5iG3T82Il9cOs0VV7DiVXdifSSD4HnOArcWjID5TheEHih44S4oe4qh/aZa8ahLzpJLo6g286uAAWxFEShH0cQeoFyVODFvsIXgodhsq7uuvVkqxu7gYe4yTq/Ri+IIphvxmv6FsHFWU2frI02qbqeuzU/nSIT0kIYYYm4cdb2FP5VItyCVR9EXoCzY14EmtiQI/xX6PZ5xznfzqBvnxht+nROz5FOT4kEyVJoXMLZvlgBrsByAu1gYvpDaGJqE7jbnDPepg87zuGsHe87n235eGm8pndDUwuPdU2PoMOf7SGrZlw354xDw4ULkEGHF8eObvCxMiOvnbbpDNpRWZvW0NSmccWxETSuNrFN5+PcVaPl2+dAR/fb6XQXdK2Gh+6o99abkt46renAq7uRY+ThnctpZ1c8+GuUATT/4NxboG2OQHOJQHOJQHOJQHOJQHNJHpqJDM5DF5TBhS81tED46R7mbwSLQk8vgy2H/lUGa9GrRQIujATCAZS9AJGDM6xpvZcfmyB/J0AXkcGp6NUyDGsSbVGif0NADZp40pCg9V5W1HQRGaxFryILlsozhKS1IwmYlpUl0AVkMHJo6HasoR0MmVCtxLBA0Fi2BrqgDM5qmkjT+qf/JPoj66AnyuAMOghD4qRpPWnDSIwvP7YPeqIMzqB1v01T0sEeddTUXZ/wjo2g/dj83vuvMtiWN+RK0LafhcgFh0ALNIsINJcINJcINJcINJdUgV7sDWnS6q0CVLbBulwwBkC3+qdg9dVWc+v1qp3XYZWgm6dg7f1m61VzDUuVbTCWad8QJsYU6I3mZ6zxTSxVtsFYJufScGFiDIFeb64NextPsFTZBmtoKBJDoIeD9/0369SmK9tgLENEUq1AzICG4frmoEk1XdkGY7lwH24G9NedIfS23gBUt8FYxvZvS5tew1779VYLev0dgIo2eB8d9CrwLDm8W4N+vwfb3wcbO80nld+QLTs52R5sbgMsrg/63zZWp4B268W77rlD/wcRaC4RaC4RaC4RaC4RaC4R6IK5srBAs4WFK3wU8NLC8ac0f3p8YYmNAj6zcEQvHFk4MxsFnH4ruVZLdh6PAdCXM+jLM1HAu58p8XsLPnfopePPl9Kl58eXplbA+WdKRMZCv/gJ/YKgp1fA2TMljIXOHd4zUcC6ps2GznVkUyvgrE0bDY1vWWcSeHzLmo0C1r230dC7T064KOBcRAFbE4HmEoHmEoHmEoHmEoHmEoEuneoKuNRliuHQE2Ix9NH9+2m2f/9RmEYBR2HiD5V3LgLaRvuq2AmNhL5x552GfnfnxjQK2G0E7tkTEEVojFSkfwP+SOwaCH3zHtWwrvF7N6dQwCRAT4R+A93hWa0Gk8qvWQRdXgFDqA5cCl3Px6Uo+Q3mQuPh/VYf3m/p8K6ugEGdDP0DJ0NcaDRcw6HzHVl1BYxHdSNQZxX4no/t23DoXKorYNyH9kgeFYy4FkKb+ZmsQMu5t0CziEBziUBziUBziUBziUAbooDHYza0HRdf00HPUgHrO4LTaT7zhz5E/zpXVx50ul/uX+s+mJUC1ncE//7REPOHXumuXF9+fH350MrKs8fLV2ekgGn9HzuFuUO/fHjt4UM4dAg6jx8tX+u+nJUC1ncE6+lY5g3d6a50O8uPHi137l/vdJa7s1LAEx4NMV/o5UNw7VlnZeXq1e71+4e6D2algPUdwTg1sU3/KwWsfyLwjDy8bXpDFmg59xZoFhFoLhFoLhFoLhFoLiFoJoPA5aGLDgL334Sgiw4C99+EoMsNApf3uiQIvJqbfhuYFMD8x8kvBF1yELic16VXVHfJfoaJ/vU9Iy+hx6DLDwKXeV1coIKKfTIGCG1DCLr8IHCZ13VjDe1g6q7+dMP4EHTJQeAyr5vVdOboaYXpIeiSg8DlvO6uNh3FfhhZ2aYLDQKXeV0Cdw4kvbfuyu08vCcOAjeuOJUxg9uVgq7udak7q5vfiuWCQ6DZRKC5RKC5RKC5RKC5JA/NRAbnocvJ4Pylhx9bcFE5AbqgDP7/ocdlsK8f4EtXmF6stAgOPGW4NMpDl5TBBK0f4Ksf5ZuKYDRGkdG1nocuJ4MJWj/AlyoX/6ciGFTcCMDg5KHLy2ClnWisobUIxkWjK3oMupQM1tBZTVOBEh0wW4nmocvJ4AwaolGbjmK6pVcZ/VFHHrqkDM6gqfduKC2Ck547NPlzvDx0YRlsd+Tcm0sEmksEmksEmksEmksEmksEumAWe0OatHqrAH+ywUZ/AbEKdKt/ClZfbTW3Xq+ClTa46kD6a+83W6+aa1gqZINpuzm3CFeF3mh+xhrfxFIhG0zbzblFuCr0enNt2Nt4gqVCNtisW4SrQg8H7/tv1qlNF7LBtN2cW4SrQsNwfXPQpJouZINpuzm3CFeF/rozhN7WG4BCNpi2G3SLcBXoNey1X2+1oNffAShig3Ejvsy5Rbg8dGvQ7/dg+/tgY6f5xM6nI5SH3h5sbgMsrg/63zZWoWAiQ96h5dybVwSaSwSaSwSaSwSaSwSaS6YbdJuPAsbh1Z/S/CkOr85GAecG0i+vgNGe0SMnSz3zd/7QlzPoy+UVsFunvQIP9yr+bdy5Qy8df76ULj0/vlRaAZNUUnHbi/AQsAn6xU/oFwhdUgGTN8RC21NWQecO7/IKWNe0ddC5jqycAs7atG3Q+JZ1JoHHt6zyClj33tZB7zo5sfQBuRq6ckQBWxOB5hKB5hKB5hKB5hKB/tHe2fU2DUNh2JZsknRxWiFVgn5KqO3FtAokBO2kbUIVGxPbtF0gwQUIJnHB//8F2DnpVlNo3awjds95QFbq5ebBTkjftedggaRLUr4mhGuvKE+lNbstbTXSd4uAzUFeR3cEM1HcEFlUFyoU6XcfvoH0tw/vnCNgpZiKZa0hYSY/NzMBahjS7z+aFYYV//jeNQLWbqOhkvqFmYFVV/qM4KVXRcBJLNPDZpQymNHnBiWtt/dX2N5fYXu71YRoDptJ2ohgJjxp+0bmWhNCHShmdPOZAKUtHCNgJjNpflrM7IZ0UJA0FkgaCySNBZLGAkljgaSxQNIlCLIscOURsBOeSm8YAW/WQL566Y750z4aXLa7Py+Ou5elImD4RLBzaYjqpQfdwUn/5qTfGQw+3fSPykTARloDowtVS3++Or66Yp0Oa99c94+7n0tFwPCJYBhdqFq63R102/3r63774qTd7ndLRcBFUQgYHahaut9hx5/ag8HRUffkotO9LBUBwyeCUxXKNb2VCBg+EZxkoWzvHYCksUDSWCBpLKCV5sggaSyQNBacpUXOLd8FnKX3zbDXeJHDC1rj1zxA3FfaDL2iHRxMIZEuEC8k14B0T4jphL8+FdNxi8+EmHHv+bd0LHJiDgguxQLcYKRb573JdMZnMz46b/Wmk8mvFvedFSt9JjRnvEDw5pjP6Z2bMZfWnrx32tKr/HpspHkArJCWph2c5AWCnyk+5y3sYSM90p6tsdY20nwkxIh7jy1tMxRiyOeI1it+x4/IjMsrracm0x73nVXS/Pb2/ljMYg7c7e7la3o044Ff0zbi/H4Fz2YcsO7et+PWZBr89raw2sFN+TJ6k4fynzZIPxizxOf+72t6w4EMksYCSWMBb+7NsEHSWCBpLGy/HZyNl031H9gOzs8agv+xHRzUiWRJJuI9yaDWL6y0PvamQdiW28FBRVCWpkzVTU3UWkOCdH7sRaOs7beDg9qvT/bkvBBsDkgzr9hiOzio8vsly6WZEkIV0kz50uZw6+3g7JUGXRi9u4dvrx2cfU2rlN1d0/o4/Gvaagf3t7t3c/4ljcQcRP508XzMdnBRluzYw8madnBmWRfq0su6b7duevZGBEljgaSxQNJYIGkskDQWHtZxBU8EvNgODk0EbHVRco+AoTQEK8pFbEb10la/LPcIOMkUFInIz9qMyqXtdnDuEXDxzfG8XESA0lY7OOcI2NjCv0aA0vb2do+AYaVDlbZuZO4RcHFNByptt4Nzj4Dh7h2o9OLDCZYI2IIi4GAgaSyQNBZIGgskjQWSxgJJb6EWcBBtuEm6RBeltRGwSvN6yFH8UkFo1BT1KBNpYNJWO7i1EbBs1OTBkCmlX0aKybpiaV3KTAYlbXdGWxsBm+NhmjQkkweL5UN3RPrvETBLo+ZhKuNEH6n8vBClrXZw6yNgFo3SpDlK9UGjIYOVtm5kayNgvasbteggYklsKgMHK22xLgLWC67MT/N1V+lOSVtEmd+/t32MCLjyX8XSszdJkzQuSBoLJI0FksYCSWPhn9LhZJsk/R+l3SNgmIfRncqll9rBbRQBwzyMzJnqpZfawW0SAcM8jO5ULr3UDm6jCBjmYSyFh+3g1kbAXpSG2E47OPcIGOb1GNY1/bAIeN7FM7DtTREwRcDBQNJYIGkskDQWSBoLJI2F1dIi5w3bMVZL7z/Vw/eXT4E/30vqv96VBC0n/dZaaTNE+89zxJ/S1Ydd25IWp89safsF2Ebxs0xkX/KVjoTw/O2zg7R41XOQrs239zMTAnpVILOMtObNRtKeJwbblzYHdRHahV1ue6sFacYq/7r/49/I8qT3XvpwLwn/mn7L2GpppkR9FNeSrLh7KxH+9rawmsDts12Bnr2R8BtG5OaqX/HEWgAAAABJRU5ErkJggg==)
+![](https://github.com/newZhaoZilong/NicePaint/blob/master/images/nicepaintmulu.PNG?raw=true)
 
 index.js
 
@@ -75,13 +75,13 @@ index.json
 
 绘制结果
 
-![](http://pj9rcpedq.bkt.clouddn.com/nicepaint7.PNG)
+![](https://github.com/newZhaoZilong/NicePaint/blob/master/images/nicepaint7.PNG?raw=true)
 
 painting的views属性需要传递一个数组,数组里添加了两个绘制对象,通过type区分,rect代表矩形,net代表网格,这样就先绘制了一个粉色的矩形，然后绘制了一个网格，后绘制的会覆盖先绘制的
 
 ## 绘制矩形 ##
 
-![](http://pj9rcpedq.bkt.clouddn.com/nicepaint0.PNG)
+![](https://github.com/newZhaoZilong/NicePaint/blob/master/images/nicepaint0.PNG?raw=true)
 
 left,right,width,height,borderRadius,lineWidth的单位都是px,坐标原点是左上角,x轴是从左到右,y轴是从上到下
 
@@ -104,7 +104,7 @@ left,right,width,height,borderRadius,lineWidth的单位都是px,坐标原点是�
 
 ## 绘制多边形drawPolygon ##
 
-![](http://pj9rcpedq.bkt.clouddn.com/nicepaint2.PNG)
+![](https://github.com/newZhaoZilong/NicePaint/blob/master/images/nicepaint2.PNG?raw=true)
 
 绘制多边形是nicepaint的核心函数,需要传递一个坐标数组,然后nicepaint会根据这些坐标点依次绘制线,最后填充,跟绘制矩形一样,isFill为true就会填充,isStroke为true就会描边,两者都存在就会先填充再描边,nicepaint的许多绘制方法都是通过绘制多边形方法延伸出来的，比如drawLine，drawRect等
 
@@ -125,6 +125,7 @@ left,right,width,height,borderRadius,lineWidth的单位都是px,坐标原点是�
 
 ## 绘制图片drawImage ##
 
+![](https://github.com/newZhaoZilong/NicePaint/blob/master/images/nicepaint6.PNG?raw=true)
 
 |属性名称|类型|单位|默认值|必填| 说明 | 
 | -------- |  ---------- | ------------- | ---------- |------------- |-------------------- |
@@ -158,6 +159,8 @@ left,right,width,height,borderRadius,lineWidth的单位都是px,坐标原点是�
 
 ## 绘制圆弧或圆drawArc ##
 
+![](https://github.com/newZhaoZilong/NicePaint/blob/master/images/nicepaint1.PNG?raw=true)
+
 |属性名称|类型|单位|默认值|必填| 说明 | 
 | -------- |  ---------- | ------------- | ---------- |------------- |-------------------- |
 | x | number |px |0|是| 圆弧中心点的x坐标 |
@@ -190,6 +193,8 @@ left,right,width,height,borderRadius,lineWidth的单位都是px,坐标原点是�
 
 ## 绘制正多边形或圆形网格drawNet ##
 
+![](https://github.com/newZhaoZilong/NicePaint/blob/master/images/nicepaint3.PNG?raw=true)
+
 |属性名称|类型|单位|默认值|必填| 说明 | 
 | -------- |  ---------- | ------------- | ---------- |------------- |-------------------- |
 | x | number | px||是| 网格中心点的x坐标 |
@@ -213,6 +218,8 @@ left,right,width,height,borderRadius,lineWidth的单位都是px,坐标原点是�
 
 ## 绘制中心多边形drawCenterPolygon ##
 
+![](https://github.com/newZhaoZilong/NicePaint/blob/master/images/nicepaint4.PNG?raw=true)
+
 有一个中心点，边数为n的多边形通过顶点与中心点的连线将多边形分成n个区域
 
 |属性名称|类型|单位|默认值|必填| 说明 | 
@@ -232,6 +239,9 @@ left,right,width,height,borderRadius,lineWidth的单位都是px,坐标原点是�
 | shadow | string |||否|设定阴影样式,需要传递一个字符串,类似'2 2 1 gray',必须是这种模式 |
 
 ## 绘制能力表drawAbilityChart ##
+
+![](https://github.com/newZhaoZilong/NicePaint/blob/master/images/nicepaint5.PNG?raw=true)
+
 绘制能力表,需要传入中心点坐标,能力值的对象数组scores,每个对象有一个score能力值属性,color对应的颜色,例如[{score:80,color:'red'},{score:70,color:'red'}],
 绘制能力表的基本步骤是
 1.绘制网格,
