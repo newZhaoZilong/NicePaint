@@ -74,33 +74,35 @@ Component({
         canvasHeight: height,
       }, () => {
         //这里如果不延时的话，安卓手机容易出错，错误现象是图片变形，就是canva的宽高并没有设置成功
-        setTimeout(() => {
+        // setTimeout(() => {
           this.downloadAllImageToCache(views, 'url')
             .then(() => {
               this.drawElements(views);
               this.ctx.draw(this.data.painting.clear || this.data.clear, () => {
-                this.saveImageToLocal()
-                  .then((res) => {
-                    this.setData({
-                      showCanvas: false,
-                      isPainting: false,
+                setTimeout(()=>{//不能马上生成图片，安卓机会出现混乱，所以要加延迟
+                  this.saveImageToLocal()
+                    .then((res) => {
+                      this.setData({
+                        showCanvas: false,
+                        isPainting: false,
+                      })
+                      this.triggerEvent('getImage', {
+                        tempFilePath: res.tempFilePath,
+                        errMsg: 'canvasdrawer:ok',
+                        id: this.data.painting.id
+                      })
+                      console.log('全部元素绘制成功');
                     })
-                    this.triggerEvent('getImage', {
-                      tempFilePath: res.tempFilePath,
-                      errMsg: 'canvasdrawer:ok',
-                      id: this.data.painting.id
+                    .catch((res) => {
+                      this.setData({
+                        showCanvas: false,
+                        isPainting: false,
+                      })
+                      this.triggerEvent('getImage', {
+                        errMsg: res.message
+                      })
                     })
-                    console.log('全部元素绘制成功');
-                  })
-                  .catch((res) => {
-                    this.setData({
-                      showCanvas: false,
-                      isPainting: false,
-                    })
-                    this.triggerEvent('getImage', {
-                      errMsg: res.message
-                    })
-                  })
+                },500)
               })
             })
             .catch((res) => {
@@ -113,7 +115,7 @@ Component({
                 errMsg: res.message
               })
             })
-        }, 300)
+        // }, 300)
       });
     },
     /**
