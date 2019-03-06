@@ -1,4 +1,4 @@
-// components/nicepaint/nicepaint.js
+ // components/nicepaint/nicepaint.js
 Component({
   /**
    * 组件的属性列表
@@ -249,7 +249,7 @@ Component({
       textAlign = 'left', //文字对齐方式
       textBaseline = 'top', //文字相对于基线位置
       fontWeight = 'normal', //文本的粗细,只有normal和bold可用
-      textDecoration = 'none', //none underline	overline lineThrough
+      textDecoration = 'none', //none underLine	overLine lineThrough
       shadow //阴影,是个字符串类似'2 2 1 gray'
     }) {
       if (!lineHeight) {
@@ -257,10 +257,10 @@ Component({
       }
       var decorationHandler = {
         none: null,
-        underline: fontSize + 1, //定义文本下的一条线
-        overline: -1, //定义文本上的一条线
+        underLine: fontSize + 1, //定义文本下的一条线
+        overLine: -1, //定义文本上的一条线
         //定义穿过文本的一条线
-        linethrough: fontSize / 2
+        lineThrough: fontSize / 2
       }
 
       this.ctx.save();
@@ -283,6 +283,15 @@ Component({
        */
       if (!width) {
         this.ctx.fillText(content, left, top);
+        var textLength = this.ctx.measureText(content).width;
+        this.drawLine({
+          left: left,
+          top: top + decorationHandler[textDecoration],
+          width: textLength,
+          align: textAlign,
+          color: color,
+          lineWidth: fontSize / 10
+        });
       } else {
         for (var i = 0; i < content.length; i++) {
           fillText += content[i];

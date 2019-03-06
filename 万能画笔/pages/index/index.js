@@ -286,7 +286,7 @@ Page({
           fontSize: 30, //字体尺寸，只有数字
           fontWeight: 'bold', //字体尺寸，只有normal和bold两种，默认normal
           shadow: '1 1 0 white', //加阴影,必须4个都写
-          textDecoration: 'linethrough'
+          textDecoration: 'lineThrough'
         }, {
           type: 'line',
           left: 250,
